@@ -15,7 +15,35 @@ import { LiveLedgerFeed } from './components/LiveLedgerFeed';
 import { LoginModal } from './components/LoginModal';
 import { AdminPortal } from './components/AdminPortal';
 import { UserDashboard } from './components/UserDashboard';
+import { FXExchangePage } from './components/FXExchangePage';
+import { InsurancePage } from './components/InsurancePage';
 import { Footer } from './components/Footer';
+
+// Hash ↔ Tab mapping
+const HASH_TO_TAB: Record<string, NavigationTab> = {
+  'uber-loans':      'uber-loans',
+  'projects':        'projects',
+  'institutional':   'institutional',
+  'fx':              'fx',
+  'insurance':       'insurance',
+  'services':        'services',
+  'sadc-map':        'sadc-map',
+  'admin-dashboard': 'admin-dashboard',
+  'dashboard':       'dashboard',
+};
+
+const TAB_TO_HASH: Record<NavigationTab, string> = {
+  'home':             '',
+  'uber-loans':       'uber-loans',
+  'projects':         'projects',
+  'institutional':    'institutional',
+  'fx':               'fx',
+  'insurance':        'insurance',
+  'services':         'services',
+  'sadc-map':         'sadc-map',
+  'admin-dashboard':  'admin-dashboard',
+  'dashboard':        'dashboard',
+};
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('home');
@@ -27,38 +55,80 @@ export const App: React.FC = () => {
   const [isMobilePreviewOpen, setIsMobilePreviewOpen] = useState<boolean>(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState<boolean>(false);
   const [selectedRegion, setSelectedRegion] = useState<string>('ZW');
-  const [theme, setTheme] = useState<string>(() => localStorage.getItem('apex_theme') || 'dark-midnight');
+  const [theme, setTheme] = useState<string>(() => {
+    const saved = localStorage.getItem('apex_theme');
+    if (saved === 'light-aura' || saved === 'theme-light') return 'theme-light';
+    return 'theme-dark';
+  });
 
-  // Sync theme class on <html> element
+  // ── Theme sync ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    document.documentElement.className = theme;
+    document.documentElement.classList.remove(
+      'theme-dark', 'theme-light', 'dark-midnight', 'light-aura', 'nordic-forest'
+    );
+    document.documentElement.classList.add(theme);
     localStorage.setItem('apex_theme', theme);
   }, [theme]);
 
-  // Load user session on mount (verify token still valid)
+  // ── Session restore + server verification ──────────────────────────────────
   useEffect(() => {
     const savedUser = localStorage.getItem('apex_user');
     if (savedUser) {
       try {
         const user = JSON.parse(savedUser);
         setCurrentUser(user);
-        // Silently verify session against server
         if (user.token) {
           fetch('/api/auth/me', {
             headers: { Authorization: `Bearer ${user.token}` },
             credentials: 'include'
           }).then(res => {
             if (!res.ok) {
-              // Session expired — clear gracefully
               localStorage.removeItem('apex_user');
               setCurrentUser(null);
             }
-          }).catch(() => {}); // network error — keep local session
+          }).catch(() => {});
         }
       } catch {
         localStorage.removeItem('apex_user');
       }
     }
+  }, []);
+
+  // ── Hash routing — read hash on mount ─────────────────────────────────────
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && HASH_TO_TAB[hash]) {
+      const target = HASH_TO_TAB[hash];
+      const protectedTabs: NavigationTab[] = ['uber-loans', 'institutional', 'admin-dashboard', 'dashboard'];
+      if (protectedTabs.includes(target) && !localStorage.getItem('apex_user')) {
+        setLoginTabMode('login');
+        setIsLoginOpen(true);
+      } else {
+        setActiveTab(target);
+      }
+    }
+  }, []);
+
+  // ── Hash routing — update URL when tab changes ─────────────────────────────
+  useEffect(() => {
+    const hash = TAB_TO_HASH[activeTab];
+    if (hash) {
+      window.history.replaceState(null, '', `#${hash}`);
+    } else {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, [activeTab]);
+
+  // ── Listen for browser back/forward ───────────────────────────────────────
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      const tab = HASH_TO_TAB[hash];
+      if (tab) setActiveTab(tab);
+      else setActiveTab('home');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   const handleLoginSuccess = (user: UserAccount) => {
@@ -67,16 +137,12 @@ export const App: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    // Clear server-side cookie
-    try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-    } catch {}
+    try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch {}
     setCurrentUser(null);
     localStorage.removeItem('apex_user');
     setActiveTab('home');
   };
 
-  // Route protection filter
   const handleSetActiveTab = (tab: NavigationTab) => {
     const protectedTabs: NavigationTab[] = ['uber-loans', 'institutional', 'admin-dashboard', 'dashboard'];
     if (protectedTabs.includes(tab) && !currentUser) {
@@ -84,7 +150,6 @@ export const App: React.FC = () => {
       setIsLoginOpen(true);
       return;
     }
-    // Admin-only protection
     if (tab === 'admin-dashboard' && currentUser?.role !== 'admin') return;
     setActiveTab(tab);
   };
@@ -94,13 +159,11 @@ export const App: React.FC = () => {
     setIsLoginOpen(true);
   };
 
-  // Tabs that show the Hero banner
-  const showHero = !['home', 'dashboard'].includes(activeTab);
+  const hiddenHeroTabs: NavigationTab[] = ['home', 'dashboard'];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0F17] text-slate-100 selection:bg-emerald-500 selection:text-slate-950 font-sans">
+    <div className="min-h-screen flex flex-col theme-bg theme-text selection:bg-emerald-500 selection:text-slate-950 font-sans">
 
-      {/* Navigation Bar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleSetActiveTab}
@@ -115,15 +178,13 @@ export const App: React.FC = () => {
         onChangeTheme={setTheme}
       />
 
-      {/* Hero Showcase Header (Hidden on Home & Dashboard pages) */}
-      {showHero && (
+      {!hiddenHeroTabs.includes(activeTab) && (
         <Hero
           onStartLoanRequest={() => handleSetActiveTab('uber-loans')}
           onBrowseProjects={() => handleSetActiveTab('projects')}
         />
       )}
 
-      {/* Main Content */}
       <main className="flex-1">
         {activeTab === 'home' && (
           <LandingPage
@@ -133,35 +194,22 @@ export const App: React.FC = () => {
           />
         )}
         {activeTab === 'dashboard' && currentUser && (
-          <UserDashboard
-            currentUser={currentUser}
-            onNavigate={(tab) => handleSetActiveTab(tab)}
-          />
+          <UserDashboard currentUser={currentUser} onNavigate={(tab) => handleSetActiveTab(tab)} />
         )}
-        {activeTab === 'uber-loans' && <UberForLoansSimulator currentUser={currentUser} />}
-        {activeTab === 'projects' && <ProjectMarketplace currentUser={currentUser} />}
+        {activeTab === 'uber-loans'    && <UberForLoansSimulator currentUser={currentUser} />}
+        {activeTab === 'projects'      && <ProjectMarketplace currentUser={currentUser} />}
         {activeTab === 'institutional' && <InstitutionalPortal />}
-        {activeTab === 'services' && <FinancialServicesSuite />}
-        {activeTab === 'sadc-map' && <SADCExpansionMap />}
+        {activeTab === 'fx'            && <FXExchangePage />}
+        {activeTab === 'insurance'     && <InsurancePage />}
+        {activeTab === 'services'      && <FinancialServicesSuite />}
+        {activeTab === 'sadc-map'      && <SADCExpansionMap />}
         {activeTab === 'admin-dashboard' && <AdminPortal />}
 
-        {/* Escrow Ledger Transaction Feed */}
         {!['dashboard', 'admin-dashboard'].includes(activeTab) && <LiveLedgerFeed />}
       </main>
 
-      {/* Mobile App Simulator Drawer */}
-      <MobileAppPreviewModal
-        isOpen={isMobilePreviewOpen}
-        onClose={() => setIsMobilePreviewOpen(false)}
-      />
-
-      {/* Financial Calculator Drawer */}
-      <FinancialCalculatorModal
-        isOpen={isCalculatorOpen}
-        onClose={() => setIsCalculatorOpen(false)}
-      />
-
-      {/* Authentication Overlay */}
+      <MobileAppPreviewModal isOpen={isMobilePreviewOpen} onClose={() => setIsMobilePreviewOpen(false)} />
+      <FinancialCalculatorModal isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
       {isLoginOpen && (
         <LoginModal
           initialTab={loginTabMode}
@@ -170,10 +218,7 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* Floating AI Advisor */}
       <AiAdvisorWidget />
-
-      {/* Footer */}
       <Footer />
     </div>
   );

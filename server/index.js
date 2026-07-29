@@ -8,7 +8,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateChatReply } from './ai.js';
 import { 
   initDb, 
   getLoanRequests, 
@@ -490,59 +490,14 @@ app.get('/api/insurance', async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { query } = req.body;
+    const { query, history } = req.body;
     if (!query) return res.status(400).json({ error: 'Query is required' });
-    const qLower = query.toLowerCase().trim();
 
     const [loans, insts, fxRates, pitches] = await Promise.all([
       getLoanRequests(), getInstitutions(), getLiveFxRates(), getProjectPitches()
     ]);
 
-    const zwgRate = fxRates.find(r => r.quoteCurrency === 'ZWG')?.rate || 13.85;
-    const zarRate = fxRates.find(r => r.quoteCurrency === 'ZAR')?.rate || 18.24;
-    const bwpRate = fxRates.find(r => r.quoteCurrency === 'BWP')?.rate || 13.62;
-    const totalPool = insts.reduce((acc, curr) => acc + curr.activeLiquidityUSD, 0);
-    const bankNames = insts.map(i => i.name).join(', ');
-
-    const dbContext = `
-      Live SADC ApexLend Platform State:
-      - Active Loans: ${loans.length} | Funded: ${loans.filter(l => l.status === 'Funded').length}
-      - Bidding Banks: ${bankNames}
-      - Total Liquidity: $${(totalPool / 1e6).toFixed(1)}M USD
-      - USD/ZWG: ${zwgRate} | USD/ZAR: ${zarRate} | USD/BWP: ${bwpRate}
-      - Active Venture Pitches: ${pitches.length}
-    `;
-
-    let replyText = '';
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-2.0-flash',
-          systemInstruction: 'You are Apex AI, an expert SADC financial advisor. Be brief, clear, and professional. Use the platform context provided. No markdown — plain sentences only.'
-        });
-        const result = await model.generateContent(`Platform Context:\n${dbContext}\n\nUser: ${query}`);
-        replyText = result.response.text().trim();
-      } catch (apiErr) {
-        console.warn('Gemini fallback:', apiErr.message);
-      }
-    }
-
-    if (!replyText) {
-      if (qLower.includes('rate') || qLower.includes('apr') || qLower.includes('interest'))
-        replyText = `Current average loan rate is 7.8% APR. Solar projects qualify at 6.8%. There are ${loans.length} active credit files in underwriting.`;
-      else if (qLower.includes('fx') || qLower.includes('exchange') || qLower.includes('zar') || qLower.includes('zwg'))
-        replyText = `Live interbank rates: USD/ZWG ${zwgRate}, USD/ZAR ${zarRate}, USD/BWP ${bwpRate}. Zero-margin clearing on ApexLend rails.`;
-      else if (qLower.includes('bank') || qLower.includes('lender') || qLower.includes('institution'))
-        replyText = `Active lenders: ${bankNames}. Combined liquidity pool: $${(totalPool / 1e6).toFixed(1)}M USD with auto-bid parameters active.`;
-      else if (qLower.includes('loan') || qLower.includes('apply') || qLower.includes('credit'))
-        replyText = `Apply in the Solutions workspace. ${loans.filter(l => l.status === 'Funded').length} loans have been funded by regional banks so far.`;
-      else if (qLower.includes('project') || qLower.includes('pitch') || qLower.includes('invest'))
-        replyText = `There are ${pitches.length} live ventures in the Pitch Room seeking capital from $250. ROI projections range up to 21% p.a.`;
-      else
-        replyText = 'I am Apex AI. Ask me about loan rates, FX corridors, participating banks, or investment pitches across SADC.';
-    }
-
+    const replyText = await generateChatReply(query, { loans, insts, fxRates, pitches }, history || []);
     res.json({ text: replyText });
   } catch (err) {
     res.status(500).json({ error: 'AI processing failed: ' + err.message });

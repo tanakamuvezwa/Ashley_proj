@@ -4,11 +4,7 @@ import {
   X, 
   Send, 
   Sparkles, 
-  ChevronRight, 
-  HelpCircle, 
-  Zap, 
-  ShieldCheck,
-  Building2
+  ChevronRight
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -56,11 +52,22 @@ export const AiAdvisorWidget: React.FC = () => {
     setMessages((prev) => [...prev, typingMsg]);
 
     try {
+      const history = messages
+        .filter(m => m.text !== 'Thinking...')
+        .slice(-8)
+        .map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', text: m.text }));
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ query, history })
       });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || 'Server error');
+      }
+
       const data = await response.json();
       
       setMessages((prev) => {
@@ -103,26 +110,26 @@ export const AiAdvisorWidget: React.FC = () => {
 
       {/* Floating Chat Modal Panel */}
       {isOpen && (
-        <div className="glass-card w-[360px] sm:w-[400px] h-[520px] rounded-3xl border-emerald-500/40 shadow-2xl flex flex-col overflow-hidden animate-fade-in relative bg-[#0B0F17]/95">
+        <div className="glass-card w-[360px] sm:w-[400px] h-[520px] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-fade-in relative">
           
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 border-b border-slate-800 flex items-center justify-between">
+          <div className="p-4 border-b theme-border flex items-center justify-between" style={{ background: 'var(--bg-surface)' }}>
             <div className="flex items-center space-x-2.5">
               <div className="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white flex items-center space-x-1">
+                <h4 className="text-sm font-bold theme-text flex items-center space-x-1">
                   <span>Apex AI Assistant</span>
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 </h4>
-                <p className="text-[10px] text-emerald-400 font-medium">Online • 28 SADC Banks Connected</p>
+                <p className="text-[10px] text-emerald-500 font-medium">Online • SADC Financial Advisor</p>
               </div>
             </div>
 
             <button 
               onClick={() => setIsOpen(false)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-lg theme-muted hover:theme-text transition"
             >
               <X className="w-5 h-5" />
             </button>
@@ -139,10 +146,10 @@ export const AiAdvisorWidget: React.FC = () => {
                   className={`max-w-[85%] p-3.5 rounded-2xl leading-relaxed ${
                     msg.sender === 'user'
                       ? 'bg-emerald-600 text-white rounded-br-none'
-                      : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none shadow-md'
+                      : 'glass-card theme-text rounded-bl-none shadow-md'
                   }`}
                 >
-                  <p>{msg.text}</p>
+                  <p className={msg.text === 'Thinking...' ? 'animate-pulse theme-muted' : ''}>{msg.text}</p>
 
                   {/* Quick actions chips */}
                   {msg.quickActions && (
@@ -171,7 +178,8 @@ export const AiAdvisorWidget: React.FC = () => {
               e.preventDefault();
               handleSend();
             }}
-            className="p-3 bg-slate-950 border-t border-slate-800 flex items-center space-x-2"
+            className="p-3 border-t theme-border flex items-center space-x-2"
+            style={{ background: 'var(--bg-surface)' }}
           >
             <input
               type="text"

@@ -3,68 +3,108 @@
 @tailwind utilities;
 
 @layer base {
-  /* Default Theme (Midnight Dark) */
-  :root, .dark-midnight {
-    --bg-main: #0B0F17;
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    --border-glass: rgba(255, 255, 255, 0.08);
-    --card-bg: rgba(15, 23, 42, 0.65);
-    --input-bg: rgba(11, 15, 23, 0.6);
-    --text-glow: rgba(52, 211, 153, 0.4);
-    --bg-glow-1: rgba(16, 185, 129, 0.08);
-    --bg-glow-2: rgba(245, 158, 11, 0.06);
-    --card-text: #ffffff;
+  /* ─── Dark theme (default) ─────────────────────────────────────── */
+  :root,
+  .theme-dark {
+    --bg-main:       #0f172a;
+    --bg-surface:    #1e293b;
+    --bg-card:       rgba(30, 41, 59, 0.85);
+    --bg-input:      rgba(15, 23, 42, 0.8);
+    --bg-nav:        rgba(15, 23, 42, 0.92);
+    --text-primary:  #f1f5f9;
+    --text-muted:    #94a3b8;
+    --text-subtle:   #64748b;
+    --border:        rgba(255, 255, 255, 0.08);
+    --accent:        #10b981;
+    --accent-hover:  #059669;
+    --accent-soft:   rgba(16, 185, 129, 0.15);
+    --glow-1:        rgba(16, 185, 129, 0.06);
+    --glow-2:        rgba(59, 130, 246, 0.04);
   }
 
-  /* Light Theme (Aura Light) */
-  .light-aura {
-    --bg-main: #f8fafc;
-    --text-main: #0f172a;
-    --text-muted: #475569;
-    --border-glass: rgba(0, 0, 0, 0.09);
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --input-bg: rgba(241, 245, 249, 0.9);
-    --text-glow: rgba(5, 150, 105, 0.2);
-    --bg-glow-1: rgba(16, 185, 129, 0.04);
-    --bg-glow-2: rgba(245, 158, 11, 0.03);
-    --card-text: #0f172a;
+  /* ─── Light theme ────────────────────────────────────────────── */
+  .theme-light {
+    --bg-main:       #f1f5f9;
+    --bg-surface:    #ffffff;
+    --bg-card:       rgba(255, 255, 255, 0.95);
+    --bg-input:      #f8fafc;
+    --bg-nav:        rgba(255, 255, 255, 0.95);
+    --text-primary:  #0f172a;
+    --text-muted:    #475569;
+    --text-subtle:   #94a3b8;
+    --border:        rgba(0, 0, 0, 0.1);
+    --accent:        #059669;
+    --accent-hover:  #047857;
+    --accent-soft:   rgba(5, 150, 105, 0.12);
+    --glow-1:        rgba(16, 185, 129, 0.05);
+    --glow-2:        rgba(245, 158, 11, 0.03);
   }
 
-  /* Nordic Forest Ambience */
+  /* Legacy theme name migration */
+  .dark-midnight,
   .nordic-forest {
-    --bg-main: #0b1a16;
-    --text-main: #e2e8f0;
-    --text-muted: #64748b;
-    --border-glass: rgba(52, 211, 153, 0.12);
-    --card-bg: rgba(10, 37, 30, 0.65);
-    --input-bg: rgba(4, 25, 20, 0.7);
-    --text-glow: rgba(20, 184, 166, 0.4);
-    --bg-glow-1: rgba(20, 184, 166, 0.08);
-    --bg-glow-2: rgba(52, 211, 153, 0.06);
-    --card-text: #f8fafc;
+    --bg-main:       #0f172a;
+    --bg-surface:    #1e293b;
+    --bg-card:       rgba(30, 41, 59, 0.85);
+    --bg-input:      rgba(15, 23, 42, 0.8);
+    --bg-nav:        rgba(15, 23, 42, 0.92);
+    --text-primary:  #f1f5f9;
+    --text-muted:    #94a3b8;
+    --text-subtle:   #64748b;
+    --border:        rgba(255, 255, 255, 0.08);
+    --accent:        #10b981;
+    --accent-hover:  #059669;
+    --accent-soft:   rgba(16, 185, 129, 0.15);
+    --glow-1:        rgba(16, 185, 129, 0.06);
+    --glow-2:        rgba(59, 130, 246, 0.04);
+  }
+
+  .light-aura {
+    --bg-main:       #f1f5f9;
+    --bg-surface:    #ffffff;
+    --bg-card:       rgba(255, 255, 255, 0.95);
+    --bg-input:      #f8fafc;
+    --bg-nav:        rgba(255, 255, 255, 0.95);
+    --text-primary:  #0f172a;
+    --text-muted:    #475569;
+    --text-subtle:   #94a3b8;
+    --border:        rgba(0, 0, 0, 0.1);
+    --accent:        #059669;
+    --accent-hover:  #047857;
+    --accent-soft:   rgba(5, 150, 105, 0.12);
+    --glow-1:        rgba(16, 185, 129, 0.05);
+    --glow-2:        rgba(245, 158, 11, 0.03);
   }
 
   body {
     background-color: var(--bg-main);
-    background-image: 
-      radial-gradient(circle at 15% 15%, var(--bg-glow-1) 0%, transparent 40%),
-      radial-gradient(circle at 85% 75%, var(--bg-glow-2) 0%, transparent 45%);
+    background-image:
+      radial-gradient(ellipse at 15% 15%, var(--glow-1) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 80%, var(--glow-2) 0%, transparent 45%);
     background-attachment: fixed;
-    color: var(--text-main);
+    color: var(--text-primary);
     font-family: 'Outfit', 'Inter', sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.25s ease;
   }
 }
 
-/* Custom Glassmorphism Component Classes */
+/* ─── Theme-aware utility classes ──────────────────────────────────── */
+.theme-bg       { background-color: var(--bg-main); }
+.theme-surface  { background-color: var(--bg-surface); }
+.theme-nav      { background-color: var(--bg-nav); }
+.theme-text     { color: var(--text-primary); }
+.theme-muted    { color: var(--text-muted); }
+.theme-border   { border-color: var(--border); }
+.theme-accent   { color: var(--accent); }
+
+/* ─── Component utility classes ────────────────────────────────────── */
 .glass-card {
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
-  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  background: var(--bg-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .glass-card-hover {
@@ -72,23 +112,22 @@
 }
 
 .glass-card-hover:hover {
-  background: rgba(20, 30, 55, 0.75);
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: var(--accent);
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px -10px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 16px 48px -12px var(--accent-soft);
 }
 
 .glass-input {
-  background: var(--input-bg);
-  border: 1px solid var(--border-glass);
-  color: var(--text-main);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   transition: all 0.2s ease;
 }
 
 .glass-input:focus {
   outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .gold-gradient-text {
@@ -104,48 +143,40 @@
 }
 
 .shimmer-button {
-  background: linear-gradient(90deg, #10b981 0%, #059669 50%, #10b981 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 50%, var(--accent) 100%);
   background-size: 200% 100%;
   animation: shimmer 3s infinite;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0B0F17;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
+/* ─── Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-subtle); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* Custom CSS Motion Animations */
+/* ─── Animations ────────────────────────────────────────────────────── */
 @keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(1.5deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-10px) rotate(1.5deg); }
 }
 
 @keyframes scan {
-  0% { top: 0%; opacity: 0.8; }
-  50% { top: 100%; opacity: 0.2; }
-  100% { top: 0%; opacity: 0.8; }
+  0%   { top: 0%;   opacity: 0.8; }
+  50%  { top: 100%; opacity: 0.2; }
+  100% { top: 0%;   opacity: 0.8; }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
-.animate-scan {
-  animation: scan 4s linear infinite;
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.animate-spin-slow {
-  animation: spin 12s linear infinite;
-}
+.animate-float     { animation: float 6s ease-in-out infinite; }
+.animate-scan      { animation: scan 4s linear infinite; }
+.animate-spin-slow { animation: spin 12s linear infinite; }
+.animate-fade-in   { animation: fade-in 0.25s ease-out; }

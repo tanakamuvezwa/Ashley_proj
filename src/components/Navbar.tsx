@@ -15,7 +15,6 @@ import {
   ShieldAlert,
   Sun,
   Moon,
-  Compass,
   LayoutDashboard
 } from 'lucide-react';
 import { NavigationTab, UserAccount } from '../types';
@@ -45,8 +44,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const isLight = theme === 'theme-light';
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-slate-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b theme-border theme-nav backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand Rebrand Logo */}
@@ -58,17 +59,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             A
           </div>
           <div>
-            <h1 className="font-extrabold text-sm text-white tracking-wide leading-none">
+            <h1 className="font-extrabold text-sm theme-text tracking-wide leading-none">
               ApexLend
             </h1>
-            <span className="text-[9px] text-slate-500 font-bold tracking-widest block mt-0.5 uppercase">
+            <span className="text-[9px] theme-muted font-bold tracking-widest block mt-0.5 uppercase">
               SADC Credit Corridor
             </span>
           </div>
         </div>
 
         {/* Clean Navigation Bar Stack */}
-        <nav className="hidden md:flex items-center space-x-1.5 bg-slate-900/40 p-1 rounded-xl border border-white/5">
+        <nav className={`hidden md:flex items-center space-x-1.5 p-1 rounded-xl border theme-border ${isLight ? 'bg-slate-100/80' : 'bg-slate-900/40'}`}>
           
           {/* Guest/Unauthenticated Navigation */}
           {!currentUser ? (
@@ -78,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === 'home'
                     ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
+                    : isLight ? 'theme-muted hover:theme-text hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
                 <Home className="w-3.5 h-3.5" />
@@ -89,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === 'projects'
                     ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
+                    : isLight ? 'theme-muted hover:theme-text hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
@@ -104,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === 'dashboard'
                     ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
+                    : isLight ? 'theme-muted hover:theme-text hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
@@ -117,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
                     activeTab === 'uber-loans'
                       ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
+                      : isLight ? 'theme-muted hover:theme-text hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                   }`}
                 >
                   <Zap className="w-3.5 h-3.5" />
@@ -131,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
                     activeTab === 'institutional'
                       ? 'bg-emerald-600 text-white shadow-md'
-                      : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
+                      : isLight ? 'theme-muted hover:theme-text hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5" />
@@ -144,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
                   activeTab === 'projects'
                     ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
+                    : isLight ? 'theme-muted hover:theme-text hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
@@ -172,50 +173,22 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Actions Block */}
         <div className="flex items-center space-x-3">
           
-          {/* Ambience Switcher Dropdown */}
-          <div className="relative group shrink-0">
-            <button className="p-2.5 rounded-xl bg-slate-900 border border-white/5 text-slate-350 hover:text-white transition cursor-pointer flex items-center space-x-1">
-              {theme === 'dark-midnight' && <Moon className="w-4 h-4 text-emerald-400" />}
-              {theme === 'light-aura' && <Sun className="w-4 h-4 text-amber-500 animate-spin-slow" style={{ animationDuration: '8s' }} />}
-              {theme === 'nordic-forest' && <Compass className="w-4 h-4 text-teal-400" />}
-              <ChevronDown className="w-3 h-3 text-slate-500" />
-            </button>
-            <div className="absolute right-0 mt-2 w-44 rounded-2xl bg-[#0F172A] border border-white/10 shadow-2xl p-1.5 hidden group-hover:block transition duration-200 z-50 text-[10.5px] font-sans">
-              <button 
-                onClick={() => onChangeTheme('dark-midnight')}
-                className={`w-full flex items-center space-x-2 px-3 py-2.5 rounded-xl text-left transition ${
-                  theme === 'dark-midnight' ? 'bg-slate-800 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
-                }`}
-              >
-                <Moon className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Midnight Dark</span>
-              </button>
-              <button 
-                onClick={() => onChangeTheme('light-aura')}
-                className={`w-full flex items-center space-x-2 px-3 py-2.5 rounded-xl text-left transition ${
-                  theme === 'light-aura' ? 'bg-slate-800 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
-                }`}
-              >
-                <Sun className="w-3.5 h-3.5 text-amber-500" />
-                <span>Aura Light</span>
-              </button>
-              <button 
-                onClick={() => onChangeTheme('nordic-forest')}
-                className={`w-full flex items-center space-x-2 px-3 py-2.5 rounded-xl text-left transition ${
-                  theme === 'nordic-forest' ? 'bg-slate-800 text-white font-bold' : 'text-slate-300 hover:bg-slate-800/50'
-                }`}
-              >
-                <Compass className="w-3.5 h-3.5 text-teal-400" />
-                <span>Nordic Forest</span>
-              </button>
-            </div>
-          </div>
+          {/* Theme toggle */}
+          <button
+            onClick={() => onChangeTheme(isLight ? 'theme-dark' : 'theme-light')}
+            className={`p-2.5 rounded-xl border theme-border transition cursor-pointer flex items-center space-x-1.5 ${isLight ? 'bg-slate-100 theme-muted hover:theme-text' : 'bg-slate-900 text-slate-400 hover:text-white'}`}
+            title={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            <span className="text-[10px] font-semibold hidden sm:inline">{isLight ? 'Dark' : 'Light'}</span>
+          </button>
 
           {!currentUser ? (
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => onOpenLogin('login')}
-                className="px-4 py-2 rounded-xl bg-slate-900 border border-white/5 hover:border-white/15 text-slate-200 text-xs font-bold transition cursor-pointer"
+                className="px-4 py-2 rounded-xl border theme-border hover:border-[var(--accent)] theme-text text-xs font-bold transition cursor-pointer"
+                style={{ background: 'var(--bg-surface)' }}
               >
                 Sign In
               </button>
@@ -228,17 +201,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           ) : (
             <div className="relative group">
-              <button className="flex items-center space-x-2 px-3 py-2 bg-slate-900 border border-white/10 hover:border-white/20 rounded-xl text-xs text-white transition shrink-0 cursor-pointer">
+              <button className={`flex items-center space-x-2 px-3 py-2 border theme-border hover:border-[var(--accent)] rounded-xl text-xs theme-text transition shrink-0 cursor-pointer`} style={{ background: 'var(--bg-surface)' }}>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="font-semibold text-slate-200 max-w-[80px] sm:max-w-[120px] truncate">{currentUser.name}</span>
+                <span className="font-semibold max-w-[80px] sm:max-w-[120px] truncate">{currentUser.name}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
               
               {/* Dropdown Card */}
-              <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#0F172A] border border-white/10 shadow-2xl p-2 hidden group-hover:block transition duration-200 z-50">
-                <div className="px-3.5 py-2.5 border-b border-white/5 mb-1.5">
-                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider leading-none">Active Profile</p>
-                  <p className="text-xs text-white font-bold mt-1 max-w-[150px] truncate">{currentUser.email}</p>
+              <div className={`absolute right-0 mt-2 w-48 rounded-2xl border theme-border shadow-2xl p-2 hidden group-hover:block transition duration-200 z-50`} style={{ background: 'var(--bg-surface)' }}>
+                <div className="px-3.5 py-2.5 border-b theme-border mb-1.5">
+                  <p className="text-[10px] theme-muted uppercase font-black tracking-wider leading-none">Active Profile</p>
+                  <p className="text-xs theme-text font-bold mt-1 max-w-[150px] truncate">{currentUser.email}</p>
                   <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/50 text-emerald-400 border border-emerald-900/50 mt-1.5 inline-block uppercase font-bold">
                     {currentUser.role}
                   </span>
@@ -268,7 +241,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/5 bg-slate-950 px-4 py-4 space-y-3 font-sans text-xs">
+        <div className={`md:hidden border-t theme-border theme-nav px-4 py-4 space-y-3 font-sans text-xs`}>
           
           {!currentUser ? (
             <>
