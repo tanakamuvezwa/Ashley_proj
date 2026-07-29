@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { INITIAL_PROJECT_PITCHES } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
 import { ProjectPitch } from '../types';
 import { 
   Briefcase, 
@@ -18,7 +17,7 @@ import {
 } from 'lucide-react';
 
 export const ProjectMarketplace: React.FC = () => {
-  const [pitches, setPitches] = useState<ProjectPitch[]>(INITIAL_PROJECT_PITCHES);
+  const [pitches, setPitches] = useState<ProjectPitch[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedCountry, setSelectedCountry] = useState<string>('All');
 
@@ -35,6 +34,19 @@ export const ProjectMarketplace: React.FC = () => {
   const [newRoi, setNewRoi] = useState<number>(20);
   const [newSummary, setNewSummary] = useState<string>('');
   const [newLocation, setNewLocation] = useState<string>('Harare, Zimbabwe');
+
+  const fetchPitches = () => {
+    fetch('/api/project-pitches')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setPitches(data);
+      })
+      .catch(err => console.error('Failed to load project pitches:', err));
+  };
+
+  useEffect(() => {
+    fetchPitches();
+  }, []);
 
   // Filter Logic
   const filteredPitches = pitches.filter((p) => {
@@ -64,46 +76,38 @@ export const ProjectMarketplace: React.FC = () => {
   };
 
   // Handle New Project Pitch Submission
-  const handleCreateProject = (e: React.FormEvent) => {
+  const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newPitch: ProjectPitch = {
-      id: `PRJ-${Math.floor(1000 + Math.random() * 9000)}`,
-      title: newTitle || 'SADC Innovation Project',
-      tagline: 'High potential business expansion initiative.',
-      category: newCategory,
-      targetCapital: newTarget,
-      raisedCapital: 2500,
-      currency: 'USD',
-      projectedROI: newRoi,
-      minInvestment: 250,
-      durationMonths: 24,
-      location: newLocation,
-      country: 'Zimbabwe',
-      entrepreneur: {
-        name: 'Ashley Founder',
-        role: 'Managing Director',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-        verified: true
-      },
-      pitchSummary: newSummary || 'Expanding regional footprint and production capacity.',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-      backersCount: 1,
-      riskRating: 'AA',
-      highlights: ['AI Verified Financial Plan', 'SADC Market Off-take', 'Local Regulatory Clearance']
-    };
+    try {
+      const response = await fetch('/api/project-pitches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newTitle || 'SADC Innovation Project',
+          category: newCategory,
+          targetCapital: newTarget,
+          projectedROI: newRoi,
+          pitchSummary: newSummary,
+          location: newLocation
+        })
+      });
 
-    setPitches([newPitch, ...pitches]);
-    setShowSubmitModal(false);
-    // Reset form
-    setNewTitle('');
-    setNewSummary('');
+      if (response.ok) {
+        fetchPitches();
+        setShowSubmitModal(false);
+        setNewTitle('');
+        setNewSummary('');
+      }
+    } catch (err) {
+      console.error('Failed to create project pitch:', err);
+    }
   };
 
   return (
-    <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-white/5 pb-8">
         <div>
           <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider mb-2">
             <Briefcase className="w-4 h-4" />
@@ -376,7 +380,7 @@ export const ProjectMarketplace: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-black text-white mb-2">Investment Confirmed!</h3>
                 <p className="text-xs text-slate-300 mb-6">
-                  You have backed <strong>{investModalProject.title}</strong> with <strong>${pledgeAmount.toLocaleString()} USD</strong>. Your digital debt/equity certificate is issued on the MBONGOCIRCLE ledger.
+                  You have backed <strong>{investModalProject.title}</strong> with <strong>${pledgeAmount.toLocaleString()} USD</strong>. Your digital debt/equity certificate is issued on the ApexLend ledger.
                 </p>
                 <button
                   onClick={() => setInvestModalProject(null)}
@@ -406,7 +410,7 @@ export const ProjectMarketplace: React.FC = () => {
               <span>Pitch Your Business / Idea</span>
             </h3>
             <p className="text-xs text-slate-400 mb-6">
-              List your venture on MBONGOCIRCLE's AI marketplace to get funded by institutional investors & regional banks.
+              List your venture on ApexLend's AI marketplace to get funded by institutional investors & regional banks.
             </p>
 
             <form onSubmit={handleCreateProject} className="space-y-4">

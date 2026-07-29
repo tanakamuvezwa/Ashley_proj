@@ -1,4 +1,13 @@
-export type NavigationTab = 'uber-loans' | 'projects' | 'institutional' | 'services' | 'sadc-map';
+export type NavigationTab = 'home' | 'uber-loans' | 'projects' | 'institutional' | 'services' | 'sadc-map' | 'admin-dashboard';
+
+export interface UserAccount {
+  id: string;
+  name: string;
+  email: string;
+  role: 'borrower' | 'lender' | 'admin';
+  status: 'Active' | 'Suspended';
+  createdAt: string;
+}
 
 export interface LoanOffer {
   id: string;
@@ -44,6 +53,7 @@ export interface ProjectPitch {
   durationMonths: number;
   location: string;
   country: 'Zimbabwe' | 'South Africa' | 'Zambia' | 'Botswana' | 'Mozambique';
+  countryCode: string;
   entrepreneur: {
     name: string;
     role: string;

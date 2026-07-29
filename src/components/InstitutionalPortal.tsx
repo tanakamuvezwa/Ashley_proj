@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { INSTITUTIONAL_PROVIDERS } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
 import { InstitutionalProvider } from '../types';
 import { 
   Building2, 
@@ -12,32 +11,87 @@ import {
   FileText,
   ToggleLeft,
   ToggleRight,
-  PieChart
+  PieChart,
+  Leaf
 } from 'lucide-react';
 
 export const InstitutionalPortal: React.FC = () => {
-  const [providers, setProviders] = useState<InstitutionalProvider[]>(INSTITUTIONAL_PROVIDERS);
-  const [selectedProvider, setSelectedProvider] = useState<InstitutionalProvider>(INSTITUTIONAL_PROVIDERS[0]);
+  const [providers, setProviders] = useState<InstitutionalProvider[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<InstitutionalProvider | null>(null);
 
-  // Toggle Auto-Bidding rule for provider
-  const toggleAutoBid = (id: string) => {
-    setProviders((prev) =>
-      prev.map((p) => {
-        if (p.id === id) {
-          const updated = { ...p, autoBidEnabled: !p.autoBidEnabled };
-          if (p.id === selectedProvider.id) setSelectedProvider(updated);
-          return updated;
+  const fetchProviders = () => {
+    fetch('/api/institutions')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setProviders(data);
+          if (selectedProvider) {
+            const found = data.find(p => p.id === selectedProvider.id);
+            if (found) setSelectedProvider(found);
+          } else if (data.length > 0) {
+            setSelectedProvider(data[0]);
+          }
         }
-        return p;
       })
+      .catch(err => console.error('Failed to load institutions:', err));
+  };
+
+  useEffect(() => {
+    fetchProviders();
+  }, []);
+
+  const renderInstIcon = (logoName: string) => {
+    let id = 1018;
+    if (logoName === 'Building2') id = 1018;
+    else if (logoName === 'Leaf') id = 1019;
+    else if (logoName === 'TrendingUp') id = 1020;
+    else if (logoName === 'Zap') id = 1021;
+    
+    return (
+      <img 
+        src={`https://picsum.photos/id/${id}/60/60`} 
+        alt={logoName} 
+        className="w-5 h-5 rounded-full border border-slate-800 object-cover shrink-0" 
+      />
     );
   };
 
+  // Toggle Auto-Bidding rule for provider
+  const toggleAutoBid = async (id: string) => {
+    const provider = providers.find(p => p.id === id);
+    if (!provider) return;
+
+    try {
+      const response = await fetch(`/api/institutions/${id}/rules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          autoBidEnabled: !provider.autoBidEnabled,
+          maxTicketUSD: provider.maxTicketUSD
+        })
+      });
+      if (response.ok) {
+        fetchProviders();
+      }
+    } catch (err) {
+      console.error('Failed to toggle auto-bid:', err);
+    }
+  };
+
+  if (!selectedProvider) {
+    return (
+      <div className="py-24 text-center">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-slate-400">Loading Capital Providers...</p>
+      </div>
+    );
+  }
+
   return (
-    <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-white/5 pb-8">
         <div>
           <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider mb-2">
             <Building2 className="w-4 h-4" />
@@ -47,7 +101,7 @@ export const InstitutionalPortal: React.FC = () => {
             Capital Provider Origination & Auto-Bidding Hub
           </h2>
           <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-            MBONGOCIRCLE serves as the AI technology and distribution layer connecting regulated financial institutions and funds to high-quality project & loan demand across Africa.
+            ApexLend serves as the AI technology and distribution layer connecting regulated financial institutions and funds to high-quality project & loan demand across Africa.
           </p>
         </div>
 
@@ -70,7 +124,7 @@ export const InstitutionalPortal: React.FC = () => {
             }`}
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-2xl">{inst.logo}</span>
+              <span>{renderInstIcon(inst.logo)}</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">
                 {inst.country}
               </span>

@@ -25,12 +25,12 @@ export const Footer: React.FC = () => {
                 <Zap className="w-5 h-5 fill-slate-950" />
               </div>
               <span className="text-xl font-black text-white">
-                MBONGO<span className="gold-gradient-text">CIRCLE</span>
+                ApexLend<span className="gold-gradient-text">AI</span>
               </span>
             </div>
 
             <p className="text-slate-300 leading-relaxed max-w-sm">
-              MBONGOCIRCLE Holdings Limited ("MBONGOCIRCLE") is an Artificial Intelligence-powered financial marketplace that transforms how individuals, businesses, institutional investors, and financial institutions discover, negotiate, and transact financial products.
+              ApexLend Holdings Limited ("ApexLend") is an Artificial Intelligence-powered financial marketplace that transforms how individuals, businesses, institutional investors, and financial institutions discover, negotiate, and transact financial products.
             </p>
 
             <div className="flex items-center space-x-2 text-emerald-400 font-medium">
@@ -56,19 +56,19 @@ export const Footer: React.FC = () => {
             <h4 className="text-white font-bold text-sm uppercase tracking-wider">SADC Markets</h4>
             <ul className="space-y-2">
               <li className="flex items-center space-x-1.5 text-slate-300 font-semibold">
-                <span>🇿🇼</span> <span>Zimbabwe (Anchor HQ)</span>
+                <img src="https://flagcdn.com/w40/zw.png" alt="ZW" className="w-4 h-3 object-cover rounded-sm" /> <span>Zimbabwe (Anchor HQ)</span>
               </li>
               <li className="flex items-center space-x-1.5">
-                <span>🇿🇦</span> <span>South Africa (Capital Hub)</span>
+                <img src="https://flagcdn.com/w40/za.png" alt="ZA" className="w-4 h-3 object-cover rounded-sm" /> <span>South Africa (Capital Hub)</span>
               </li>
               <li className="flex items-center space-x-1.5">
-                <span>🇧🇼</span> <span>Botswana Corridor</span>
+                <img src="https://flagcdn.com/w40/bw.png" alt="BW" className="w-4 h-3 object-cover rounded-sm" /> <span>Botswana Corridor</span>
               </li>
               <li className="flex items-center space-x-1.5">
-                <span>🇿🇲</span> <span>Zambia Agri & Trade</span>
+                <img src="https://flagcdn.com/w40/zm.png" alt="ZM" className="w-4 h-3 object-cover rounded-sm" /> <span>Zambia Agri & Trade</span>
               </li>
               <li className="flex items-center space-x-1.5">
-                <span>🇲🇿</span> <span>Mozambique Logistics</span>
+                <img src="https://flagcdn.com/w40/mz.png" alt="MZ" className="w-4 h-3 object-cover rounded-sm" /> <span>Mozambique Logistics</span>
               </li>
             </ul>
           </div>
@@ -83,11 +83,11 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>capital@mbongocircle.com</span>
+                <span>capital@apexlend.ai</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Globe2 className="w-4 h-4 text-teal-400 shrink-0" />
-                <span>www.mbongocircle.com</span>
+                <span>www.apexlend.ai</span>
               </div>
             </div>
           </div>
@@ -96,7 +96,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Legal & Regulatory Row */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-[11px]">
-          <p>© 2026 MBONGOCIRCLE Holdings Limited. All rights reserved.</p>
+          <p>© 2026 ApexLend Holdings Limited. All rights reserved.</p>
           <div className="flex items-center space-x-4">
             <span className="flex items-center space-x-1">
               <Lock className="w-3 h-3 text-emerald-400" />

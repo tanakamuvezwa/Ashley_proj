@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { LIVE_FX_RATES, MOCK_INSURANCE_PRODUCTS } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
 import { InsuranceQuote } from '../types';
 import { 
   ArrowRightLeft, 
@@ -22,21 +21,39 @@ export const FinancialServicesSuite: React.FC = () => {
   const [selectedInsurance, setSelectedInsurance] = useState<InsuranceQuote | null>(null);
   const [insuredSuccess, setInsuredSuccess] = useState<boolean>(false);
 
+  // Loaded Insurance Products & FX Rates
+  const [insuranceProducts, setInsuranceProducts] = useState<InsuranceQuote[]>([]);
+  const [fxRates, setFxRates] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/insurance')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setInsuranceProducts(data);
+      })
+      .catch(err => console.error('Failed to load insurance products:', err));
+
+    fetch('/api/fx-rates')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setFxRates(data);
+      })
+      .catch(err => console.error('Failed to load FX rates:', err));
+  }, []);
+
   // FX Rates Lookup
   const getRate = () => {
-    if (targetCurrency === 'ZWG') return 13.85;
-    if (targetCurrency === 'ZAR') return 18.24;
-    if (targetCurrency === 'BWP') return 13.62;
-    return 1.0;
+    const match = fxRates.find(f => f.quoteCurrency === targetCurrency && f.baseCurrency === 'USD');
+    return match ? match.rate : 1.0;
   };
 
   const convertedValue = (amountUSD * getRate()).toFixed(2);
 
   return (
-    <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-white/5 pb-8">
         <div>
           <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider mb-2">
             <ArrowRightLeft className="w-4 h-4" />
@@ -150,7 +167,7 @@ export const FinancialServicesSuite: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              {MOCK_INSURANCE_PRODUCTS.map((prod) => (
+              {insuranceProducts.map((prod) => (
                 <div 
                   key={prod.id}
                   className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition flex flex-col md:flex-row md:items-center justify-between gap-4"

@@ -1,24 +1,35 @@
-import React, { useState } from 'react';
-import { INITIAL_LOAN_REQUESTS } from '../data/mockData';
-import { LoanRequest, LoanOffer } from '../types';
+import React, { useState, useEffect } from 'react';
 import { 
   Zap, 
-  Sparkles, 
-  CheckCircle, 
-  DollarSign, 
-  Building2, 
-  ShieldAlert, 
-  TrendingUp, 
-  Clock, 
   Sliders, 
-  Check, 
-  ArrowRight,
+  Building2, 
+  Leaf, 
+  TrendingUp, 
+  ShieldCheck, 
+  ArrowRight, 
+  CheckCircle,
+  AlertCircle,
+  FileText,
+  Upload,
   UserCheck,
-  Percent,
-  Calculator
+  Building
 } from 'lucide-react';
+import { LoanRequest, LoanOffer } from '../types';
 
 export const UberForLoansSimulator: React.FC = () => {
+  // KYC Verification state
+  const [kycVerified, setKycVerified] = useState<boolean>(() => {
+    return localStorage.getItem('apex_kyc_verified') === 'true';
+  });
+  const [kycLoading, setKycLoading] = useState<boolean>(false);
+  const [kycError, setKycError] = useState<string | null>(null);
+
+  // KYC Form fields
+  const [compRegNo, setCompRegNo] = useState('');
+  const [dirName, setDirName] = useState('');
+  const [bizFile, setBizFile] = useState<File | null>(null);
+  const [idFile, setIdFile] = useState<File | null>(null);
+
   // Form State for creating a new loan / funding request
   const [amount, setAmount] = useState<number>(20000);
   const [tenure, setTenure] = useState<number>(18);
@@ -36,10 +47,81 @@ export const UberForLoansSimulator: React.FC = () => {
   const [isAccepted, setIsAccepted] = useState<boolean>(false);
 
   // Existing active loan requests on the marketplace
-  const [requestsList, setRequestsList] = useState<LoanRequest[]>(INITIAL_LOAN_REQUESTS);
+  const [requestsList, setRequestsList] = useState<LoanRequest[]>([]);
+
+  useEffect(() => {
+    fetch('/api/loan-requests')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setRequestsList(data);
+      })
+      .catch(err => console.error('Failed to load loan requests:', err));
+  }, []);
+
+  const renderLenderIcon = (logoName: string) => {
+    let id = 1018;
+    if (logoName === 'Building2') id = 1018;
+    else if (logoName === 'Leaf') id = 1019;
+    else if (logoName === 'TrendingUp') id = 1020;
+    else if (logoName === 'Zap') id = 1021;
+    else if (logoName === 'Globe') id = 1022;
+    else if (logoName === 'Smartphone') id = 1023;
+    
+    return (
+      <img 
+        src={`https://picsum.photos/id/${id}/60/60`} 
+        alt={logoName} 
+        className="w-7 h-7 rounded-full border border-slate-800 object-cover shrink-0" 
+      />
+    );
+  };
+
+  // Submit KYC Documents
+  const handleKycSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!compRegNo || !dirName || !bizFile || !idFile) {
+      setKycError('Please fill in all details and upload registration/ID files.');
+      return;
+    }
+
+    setKycLoading(true);
+    setKycError(null);
+
+    try {
+      // Fetch dynamic user detail if logged in
+      const savedUserStr = localStorage.getItem('apex_user');
+      const userId = savedUserStr ? JSON.parse(savedUserStr).id : 'GUEST';
+
+      const response = await fetch('/api/kyc/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          documentType: 'Company Incorporation & Director ID',
+          fileName: bizFile.name,
+          fileSize: bizFile.size
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('KYC verification check failed');
+      }
+
+      // Simulate a small delay for underwriting compliance check
+      setTimeout(() => {
+        setKycVerified(true);
+        localStorage.setItem('apex_kyc_verified', 'true');
+        setKycLoading(false);
+      }, 1500);
+
+    } catch (err: any) {
+      setKycError(err.message || 'Verification failed. Please retry.');
+      setKycLoading(false);
+    }
+  };
 
   // Trigger AI Matching Process
-  const handleRunAiMatching = (e: React.FormEvent) => {
+  const handleRunAiMatching = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsEvaluating(true);
     setEvaluationProgress(15);
@@ -47,446 +129,471 @@ export const UberForLoansSimulator: React.FC = () => {
     setSelectedOffer(null);
     setIsAccepted(false);
 
-    const interval = setInterval(() => {
-      setEvaluationProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(interval);
-          
-          // Generate simulated real-time offers
-          const monthlyPaymentEst = Math.round((amount * (1 + 0.08)) / tenure);
-          const totalRepaymentEst = monthlyPaymentEst * tenure;
-
-          const newRequest: LoanRequest = {
-            id: `LR-${Math.floor(1000 + Math.random() * 9000)}`,
-            borrowerName: borrowerName || 'Ashley Project Lead',
-            borrowerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-            businessName: businessName || 'SADC Project Innovation',
-            category: category,
-            amountRequested: amount,
-            currency: 'USD',
-            tenureMonths: tenure,
-            creditScore: 785,
-            riskScore: 'Low Risk (A+)',
-            purpose: purpose,
-            location: location,
-            status: 'Bidding Active',
-            createdAt: 'Just Now',
-            offers: [
-              {
-                id: `LO-${Math.random()}`,
-                lenderName: 'Stanbic Bank Zimbabwe',
-                lenderType: 'Commercial Bank',
-                lenderLogo: '🏛️',
-                interestRate: 7.8,
-                monthlyPayment: monthlyPaymentEst,
-                totalRepayment: totalRepaymentEst,
-                approvalProbability: 99,
-                turnaroundTimeHours: 1,
-                specialFeatures: ['Direct supplier payment', '0% early settlement fee', 'Dedicated relationship officer']
-              },
-              {
-                id: `LO-${Math.random()}`,
-                lenderName: 'CBZ Agribusiness & Private Capital',
-                lenderType: 'Commercial Bank',
-                lenderLogo: '🌿',
-                interestRate: 7.2,
-                monthlyPayment: Math.round(monthlyPaymentEst * 0.98),
-                totalRepayment: Math.round(totalRepaymentEst * 0.98),
-                approvalProbability: 96,
-                turnaroundTimeHours: 2,
-                specialFeatures: ['Bundled agricultural insurance discount', 'Grace period until first harvest']
-              },
-              {
-                id: `LO-${Math.random()}`,
-                lenderName: 'Old Mutual SADC Impact Fund',
-                lenderType: 'SADC Private Equity',
-                lenderLogo: '🦁',
-                interestRate: 6.9,
-                monthlyPayment: Math.round(monthlyPaymentEst * 0.96),
-                totalRepayment: Math.round(totalRepaymentEst * 0.96),
-                approvalProbability: 92,
-                turnaroundTimeHours: 4,
-                specialFeatures: ['ESG Sustainability rebate', 'Regional export facilitation']
-              }
-            ]
-          };
-
-          setGeneratedRequest(newRequest);
-          setRequestsList((prevList) => [newRequest, ...prevList]);
-          setIsEvaluating(false);
-          return 100;
-        }
-        return prev + 25;
+    try {
+      const response = await fetch('/api/loan-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          borrowerName,
+          businessName,
+          category,
+          amountRequested: amount,
+          tenureMonths: tenure,
+          purpose,
+          location
+        })
       });
-    }, 400);
+
+      if (!response.ok) {
+        throw new Error('Failed to submit loan request');
+      }
+
+      const newRequest = await response.json();
+
+      // Trigger progress bar increments
+      const interval = setInterval(() => {
+        setEvaluationProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(interval);
+            setGeneratedRequest(newRequest);
+            setRequestsList((prevList) => [newRequest, ...prevList]);
+            setIsEvaluating(false);
+            return 100;
+          }
+          return prev + 25;
+        });
+      }, 400);
+
+    } catch (err) {
+      console.error('Error matching loan request:', err);
+      setIsEvaluating(false);
+    }
   };
 
-  const handleAcceptOffer = (offer: LoanOffer) => {
-    setSelectedOffer(offer);
-    setIsAccepted(true);
+  const handleAcceptOffer = async (offer: LoanOffer) => {
+    if (!generatedRequest) return;
+    try {
+      const response = await fetch(`/api/loan-requests/${generatedRequest.id}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ offerId: offer.id })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setSelectedOffer(offer);
+        setIsAccepted(true);
+        // Refresh feed list
+        const res = await fetch('/api/loan-requests');
+        const list = await res.json();
+        if (Array.isArray(list)) setRequestsList(list);
+      }
+    } catch (err) {
+      console.error('Failed to accept offer:', err);
+    }
   };
 
   return (
-    <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 font-sans">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6">
-        <div>
-          <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider mb-2">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-white/5 pb-8">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
             <Zap className="w-4 h-4" />
-            <span>AI Automated Bidding Engine</span>
+            <span>Real-time matching desk</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-            "Uber for Loans" Matching Engine
+          <h2 className="text-3xl font-extrabold text-white">
+            Solutions Funding matching workbench
           </h2>
-          <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-            Submit your project capital request. MBONGOCIRCLE's AI underwrites your profile in real-time and alerts competing banks & capital providers to bid for your loan.
+          <p className="text-slate-400 text-xs max-w-xl leading-relaxed">
+            Verify identity credentials, submit capital metrics, and obtain competitive debt interest bids directly from participating sovereign institutions in SADC.
           </p>
         </div>
 
-        <div className="mt-4 md:mt-0 flex items-center space-x-3 bg-slate-900/80 p-2 rounded-xl border border-slate-800">
-          <div className="flex -space-x-2">
-            <span className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-xs">🏛️</span>
-            <span className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-xs">🌿</span>
-            <span className="w-8 h-8 rounded-full bg-teal-500/20 border border-teal-500/50 flex items-center justify-center text-xs">⚡</span>
+        <div className="mt-4 md:mt-0 flex items-center space-x-3 bg-slate-900/60 p-3 rounded-xl border border-white/10 shrink-0">
+          <div className="flex -space-x-1.5">
+            <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400"><Building2 className="w-3.5 h-3.5" /></div>
+            <div className="w-7 h-7 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400"><Leaf className="w-3.5 h-3.5" /></div>
+            <div className="w-7 h-7 rounded-full bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400"><TrendingUp className="w-3.5 h-3.5" /></div>
           </div>
-          <div className="text-xs text-slate-300">
-            <p className="font-bold text-white">28 Active Lenders Online</p>
-            <p className="text-[11px] text-emerald-400">Average response: 4 mins</p>
+          <div className="text-[10px] text-slate-350 leading-tight">
+            <p className="font-bold text-white">Liquidity clearing SLA</p>
+            <p className="text-emerald-400 font-semibold mt-0.5">Average match: 4 mins</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left Column: Interactive Loan Request Form */}
+        {/* Left Column Workspace */}
         <div className="lg:col-span-5">
-          <div className="glass-card p-6 sm:p-8 rounded-3xl border-slate-800/90 shadow-2xl relative">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-white flex items-center space-x-2">
-                <Sliders className="w-5 h-5 text-emerald-400" />
-                <span>Request Capital / Loan</span>
-              </h3>
-              <span className="px-2.5 py-1 text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full">
-                Instant AI Underwrite
-              </span>
-            </div>
-
-            <form onSubmit={handleRunAiMatching} className="space-y-5">
+          
+          {/* STEP 1: KYC IDENTITY UPLOAD FORM IF NOT VERIFIED */}
+          {!kycVerified ? (
+            <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-6">
               
-              {/* Category Selector */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                  Project / Loan Purpose Category
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as any)}
-                  className="w-full glass-input px-4 py-3 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500"
-                >
-                  <option value="Agricultural Expansion">Agricultural & AgriTech Expansion</option>
-                  <option value="Solar Infrastructure">Solar & Clean Energy Infrastructure</option>
-                  <option value="Retail Working Capital">Retail Working Capital & Inventory</option>
-                  <option value="Mining Equipment">Mining & Heavy Machinery Finance</option>
-                  <option value="Tech Startup Seed">Tech Startup & Innovation Seed</option>
-                </select>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-white flex items-center space-x-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400 animate-pulse" />
+                  <span>KYC Compliance Verification</span>
+                </h3>
+                <p className="text-[10.5px] text-slate-400 leading-relaxed font-light">
+                  SADC financial rules require company and director validation before accessing banking desks. Upload documents to clear your profile.
+                </p>
               </div>
 
-              {/* Amount Range Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Capital Amount (USD)
-                  </label>
-                  <span className="text-lg font-black gold-gradient-text font-mono">
-                    ${amount.toLocaleString()} USD
-                  </span>
+              {kycError && (
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-450" />
+                  <span>{kycError}</span>
                 </div>
-                <input
-                  type="range"
-                  min={2000}
-                  max={250000}
-                  step={1000}
-                  value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
-                  className="w-full accent-emerald-500 h-2 bg-slate-800 rounded-lg cursor-pointer"
-                />
-                <div className="flex justify-between text-[11px] text-slate-400 font-mono mt-1">
-                  <span>$2,000</span>
-                  <span>$100,000</span>
-                  <span>$250,000</span>
-                </div>
-              </div>
+              )}
 
-              {/* Tenure Selection */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                    Repayment Tenure
-                  </label>
-                  <span className="text-sm font-bold text-emerald-400 font-mono">
-                    {tenure} Months
-                  </span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[6, 12, 18, 36].map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => setTenure(m)}
-                      className={`py-2 text-xs font-bold rounded-xl transition ${
-                        tenure === m
-                          ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-900/30'
-                          : 'bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700'
-                      }`}
-                    >
-                      {m} Mo
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Borrower & Project Details */}
-              <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={handleKycSubmit} className="space-y-4 text-xs">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Applicant Name</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Business Registration Number</label>
                   <input
                     type="text"
-                    value={borrowerName}
-                    onChange={(e) => setBorrowerName(e.target.value)}
-                    className="w-full glass-input px-3 py-2 rounded-xl text-xs"
-                    placeholder="Full Name"
+                    value={compRegNo}
+                    onChange={(e) => setCompRegNo(e.target.value)}
+                    placeholder="e.g. B/128/2021"
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs bg-slate-950/40 text-white"
                     required
                   />
                 </div>
+
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Business / Project</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Director Full Name</label>
+                  <input
+                    type="text"
+                    value={dirName}
+                    onChange={(e) => setDirName(e.target.value)}
+                    placeholder="As listed on passport/ID"
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs bg-slate-950/40 text-white"
+                    required
+                  />
+                </div>
+
+                {/* File Upload 1 */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Company Certificate (IPEC / CIPRO PDF)</label>
+                  <div className="relative border border-dashed border-white/10 hover:border-white/20 rounded-xl p-4 bg-slate-950/30 text-center cursor-pointer transition">
+                    <input
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={(e) => setBizFile(e.target.files?.[0] || null)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      required
+                    />
+                    <div className="flex flex-col items-center space-y-1.5 text-slate-400">
+                      <Upload className="w-5 h-5 text-emerald-400" />
+                      <span className="font-semibold text-[10px]">
+                        {bizFile ? bizFile.name : 'Select Incorporation PDF'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* File Upload 2 */}
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Director ID / Passport photo</label>
+                  <div className="relative border border-dashed border-white/10 hover:border-white/20 rounded-xl p-4 bg-slate-950/30 text-center cursor-pointer transition">
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => setIdFile(e.target.files?.[0] || null)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      required
+                    />
+                    <div className="flex flex-col items-center space-y-1.5 text-slate-400">
+                      <UserCheck className="w-5 h-5 text-emerald-400" />
+                      <span className="font-semibold text-[10px]">
+                        {idFile ? idFile.name : 'Select Identity Image'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={kycLoading}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-950/20 transition flex items-center justify-center space-x-1.5 disabled:opacity-55 cursor-pointer"
+                >
+                  {kycLoading ? (
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-4.5 h-4.5" />
+                      <span>Verify & Clear KYC</span>
+                    </>
+                  )}
+                </button>
+
+              </form>
+            </div>
+          ) : (
+            
+            /* STEP 2: ACTIVE DEBT REQUEST SUBMISSION FORM */
+            <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl relative space-y-6">
+              
+              <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                <h3 className="text-base font-bold text-white flex items-center space-x-2">
+                  <Sliders className="w-5 h-5 text-emerald-400" />
+                  <span>Request SME Capital</span>
+                </h3>
+                <span className="px-2.5 py-0.5 text-[9px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full flex items-center space-x-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>KYC cleared</span>
+                </span>
+              </div>
+
+              <form onSubmit={handleRunAiMatching} className="space-y-4 text-xs">
+                
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Project Sector Category</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as any)}
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs text-white bg-[#0F172A]"
+                  >
+                    <option value="Agricultural Expansion">Agricultural Expansion</option>
+                    <option value="Solar Infrastructure">Solar Infrastructure</option>
+                    <option value="Retail Working Capital">Retail Working Capital</option>
+                    <option value="Mining Equipment">Mining Equipment</option>
+                    <option value="Tech Startup Seed">Tech Startup Seed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Company Legal Title</label>
                   <input
                     type="text"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
-                    className="w-full glass-input px-3 py-2 rounded-xl text-xs"
-                    placeholder="Company Name"
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs bg-slate-950/40 text-white"
                     required
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-400 mb-1">Location & Purpose Summary</label>
-                <textarea
-                  rows={2}
-                  value={purpose}
-                  onChange={(e) => setPurpose(e.target.value)}
-                  className="w-full glass-input px-3 py-2 rounded-xl text-xs resize-none"
-                  placeholder="Describe what funds will be used for..."
-                  required
-                />
-              </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Applicant / Director Name</label>
+                  <input
+                    type="text"
+                    value={borrowerName}
+                    onChange={(e) => setBorrowerName(e.target.value)}
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs bg-slate-950/40 text-white"
+                    required
+                  />
+                </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isEvaluating}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-emerald-900/40 hover:shadow-emerald-500/20 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
-              >
-                {isEvaluating ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                    <span>AI Underwriting & Dispatching Bids... ({evaluationProgress}%)</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5 fill-slate-950" />
-                    <span>Request AI Live Offers Now</span>
-                  </>
-                )}
-              </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Amount requested ($)</label>
+                    <input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(Number(e.target.value))}
+                      className="w-full glass-input px-3.5 py-2 rounded-xl text-xs bg-slate-950/40 text-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tenure Months</label>
+                    <input
+                      type="number"
+                      value={tenure}
+                      onChange={(e) => setTenure(Number(e.target.value))}
+                      className="w-full glass-input px-3.5 py-2 rounded-xl text-xs bg-slate-950/40 text-white"
+                      required
+                    />
+                  </div>
+                </div>
 
-            </form>
-          </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Geographic Location</label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g. Mutare, Zimbabwe"
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs bg-slate-950/40 text-white"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Purpose & Collateral Security</label>
+                  <textarea
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs bg-slate-950/40 text-white h-20 resize-none"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isEvaluating}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-950/20 transition flex items-center justify-center space-x-1.5 disabled:opacity-55 cursor-pointer"
+                >
+                  {isEvaluating ? (
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 text-slate-955" />
+                      <span>Initiate Match Bidding</span>
+                    </>
+                  )}
+                </button>
+
+              </form>
+            </div>
+          )}
+
         </div>
 
-        {/* Right Column: AI Bidding Engine Results & Live Feed */}
+        {/* Right Column: AI Bidding & Live Bank Matches Output */}
         <div className="lg:col-span-7 space-y-6">
           
-          {/* Progress Bar when evaluating */}
+          {/* AI Matching progress bar overlay */}
           {isEvaluating && (
-            <div className="glass-card p-6 rounded-3xl border-emerald-500/30 text-center animate-pulse">
-              <div className="flex items-center justify-center space-x-3 text-emerald-400 mb-3">
-                <Sparkles className="w-6 h-6 animate-spin" />
-                <span className="font-bold text-lg">AI Financial Underwriter at Work...</span>
-              </div>
-              <p className="text-xs text-slate-300 mb-4">
-                Analyzing credit risk score, cash flow capability, asset collateral, and broadcasting loan parameters to CBZ, Stanbic, NMB, and Old Mutual funds.
-              </p>
-              <div className="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800">
+            <div className="glass-card p-6.5 rounded-2xl border border-white/10 bg-slate-900/40 text-center space-y-4">
+              <h4 className="text-sm font-bold text-white flex items-center justify-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Calculating Risk Underwriting Vectors</span>
+              </h4>
+              <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-white/5 p-0.5">
                 <div 
-                  className="bg-gradient-to-r from-emerald-500 to-amber-400 h-full transition-all duration-300"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-300"
                   style={{ width: `${evaluationProgress}%` }}
                 />
               </div>
+              <p className="text-[10px] text-slate-500 font-mono">Running compliance check: {evaluationProgress}% complete</p>
             </div>
           )}
 
-          {/* Generated Loan Offers Section (When user ran AI match) */}
-          {generatedRequest && !isEvaluating && (
-            <div className="glass-card p-6 rounded-3xl border-emerald-500/50 bg-gradient-to-br from-emerald-950/20 to-slate-900/90 shadow-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-emerald-400" />
+          {/* Matches Output List */}
+          {generatedRequest && (
+            <div className="space-y-6">
+              
+              <div className="p-4 rounded-xl bg-slate-900/60 border border-white/5 flex items-center justify-between text-xs">
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider leading-none">Credit registry ID</p>
+                  <p className="font-bold text-white mt-1.5">{generatedRequest.id}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider leading-none">AI Risk Grade</p>
+                  <p className="font-bold text-emerald-400 mt-1.5">{generatedRequest.riskScore}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider leading-none">Total bids arrived</p>
+                  <p className="font-bold text-white mt-1.5 text-center">{generatedRequest.offers?.length || 0}</p>
+                </div>
+              </div>
+
+              {!isAccepted ? (
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-white">Bank matches & quotes (Select one)</h4>
+                  <div className="grid grid-cols-1 gap-3.5">
+                    {generatedRequest.offers?.map((offer) => (
+                      <div 
+                        key={offer.id} 
+                        className="glass-card p-5 rounded-2xl border border-white/5 bg-slate-900/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-emerald-500/45 transition"
+                      >
+                        <div className="flex items-center space-x-3">
+                          {renderLenderIcon(offer.lenderLogo)}
+                          <div>
+                            <h5 className="font-bold text-white text-xs leading-none">{offer.lenderName}</h5>
+                            <span className="text-[9px] text-slate-500 font-bold block mt-1.5 uppercase font-mono">{offer.lenderType}</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-6 text-[10px] leading-tight font-mono">
+                          <div>
+                            <span className="text-[8px] text-slate-500 block uppercase font-bold">Interest APR</span>
+                            <span className="font-bold text-emerald-400 mt-0.5 block">{offer.interestRate}%</span>
+                          </div>
+                          <div>
+                            <span className="text-[8px] text-slate-500 block uppercase font-bold">Monthly payment</span>
+                            <span className="font-bold text-white mt-0.5 block">${offer.monthlyPayment.toLocaleString()}</span>
+                          </div>
+                          <div>
+                            <span className="text-[8px] text-slate-500 block uppercase font-bold">Payout Speed</span>
+                            <span className="font-bold text-amber-400 mt-0.5 block">{offer.turnaroundTimeHours}h cleared</span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleAcceptOffer(offer)}
+                          className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-[10px] rounded-lg transition cursor-pointer shrink-0 uppercase tracking-wider"
+                        >
+                          Accept Bid
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">
-                      3 Institutional Bids Received for ${generatedRequest.amountRequested.toLocaleString()}
-                    </h3>
-                    <p className="text-xs text-emerald-400 font-medium">
-                      AI Underwriting Completed • Risk Grade: {generatedRequest.riskScore} • Score: {generatedRequest.creditScore}
+                </div>
+              ) : (
+                
+                /* Bid accepted success visual check */
+                <div className="glass-card p-8 rounded-3xl border border-emerald-500/25 bg-emerald-950/5 text-center space-y-6">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400">
+                    <CheckCircle className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-black text-white">Escrow Agreement Disbursed Successfully!</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed font-light max-w-md mx-auto">
+                      You have accepted the offer from **{selectedOffer?.lenderName}** at **{selectedOffer?.interestRate}% APR**. Funds have been clearing to your verified bank accounts.
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Loan Offers Cards List */}
-              <div className="space-y-4 my-6">
-                {generatedRequest.offers.map((offer) => (
-                  <div 
-                    key={offer.id}
-                    className="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl">{offer.lenderLogo}</span>
-                        <h4 className="font-bold text-white text-base">{offer.lenderName}</h4>
-                        <span className="px-2 py-0.5 text-[10px] font-semibold bg-slate-800 text-slate-300 rounded-full">
-                          {offer.lenderType}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300 pt-1">
-                        <span>Rate: <strong className="text-emerald-400">{offer.interestRate}% APR</strong></span>
-                        <span>Monthly: <strong className="text-white font-mono">${offer.monthlyPayment.toLocaleString()}</strong></span>
-                        <span>Match Confidence: <strong className="text-amber-400">{offer.approvalProbability}%</strong></span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 pt-2">
-                        {offer.specialFeatures.map((feat, idx) => (
-                          <span key={idx} className="inline-flex items-center text-[10px] px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-300 border border-emerald-800/40">
-                            <Check className="w-2.5 h-2.5 mr-1 text-emerald-400" />
-                            {feat}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleAcceptOffer(offer)}
-                      className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold text-xs shadow-md shadow-emerald-900/30 transition shrink-0 cursor-pointer flex items-center justify-center space-x-1"
-                    >
-                      <span>Accept & Disburse</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                  <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 inline-block text-[11px] font-mono text-left space-y-1 text-slate-400">
+                    <p>• Transact ID: <span className="text-white font-bold">TXN-{(Math.random() * 1000000).toFixed(0)}</span></p>
+                    <p>• Ledger clearing rate: <span className="text-emerald-400 font-bold">{selectedOffer?.interestRate}% APR</span></p>
+                    <p>• Settlement speed: <span className="text-white font-bold">Cleared SLA Immediate</span></p>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
             </div>
           )}
 
-          {/* Offer Acceptance Celebration Modal / Banner */}
-          {isAccepted && selectedOffer && (
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-900/80 via-teal-900/80 to-slate-900 border-2 border-emerald-400 shadow-2xl text-white animate-bounce-short">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-400 text-slate-950 flex items-center justify-center font-black text-2xl">
-                    🎉
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-extrabold text-white">Loan Offer Accepted!</h4>
-                    <p className="text-xs text-emerald-200">
-                      Disbursement contract generated with <strong>{selectedOffer.lenderName}</strong>.
-                    </p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setIsAccepted(false)}
-                  className="text-xs text-slate-400 hover:text-white px-2 py-1 bg-slate-800 rounded-lg"
-                >
-                  Close
-                </button>
-              </div>
-
-              <div className="mt-4 p-4 rounded-xl bg-slate-950/60 border border-emerald-500/30 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <span className="text-slate-400 text-[10px]">Approved Amount</span>
-                  <p className="font-bold text-emerald-400 text-sm">${amount.toLocaleString()} USD</p>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px]">Interest Rate</span>
-                  <p className="font-bold text-white text-sm">{selectedOffer.interestRate}% APR</p>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px]">Estimated Payout</span>
-                  <p className="font-bold text-amber-400 text-sm">Within 2 Hours</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Active Marketplace Loan Requests Feed */}
-          <div className="glass-card p-6 rounded-3xl border-slate-800">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-amber-400" />
-                <span>Live Marketplace Requests Receiving Offers</span>
-              </h3>
-              <span className="text-xs text-emerald-400 font-semibold flex items-center space-x-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Live Feed</span>
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              {requestsList.map((req) => (
-                <div 
-                  key={req.id}
-                  className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-3">
-                      <img 
-                        src={req.borrowerAvatar} 
-                        alt={req.borrowerName} 
-                        className="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500/30"
-                      />
+          {/* Active Marketplace Loan requests view grid */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-bold text-white">Active Sovereign Credit Registries</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {requestsList.slice(0, 4).map((loan) => (
+                <div key={loan.id} className="p-4.5 rounded-2xl bg-slate-900/30 border border-white/5 hover:border-white/10 transition space-y-4 flex flex-col justify-between">
+                  <div className="space-y-2.5">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-bold text-sm text-white">{req.businessName}</h4>
-                        <p className="text-[11px] text-slate-400">{req.borrowerName} • {req.location}</p>
+                        <span className="text-[9px] text-slate-500 uppercase font-black font-mono block leading-none">{loan.id}</span>
+                        <h5 className="font-bold text-white text-xs mt-1.5">{loan.businessName}</h5>
                       </div>
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-bold ${
+                        loan.status === 'Funded' 
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                      }`}>
+                        {loan.status}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 leading-relaxed font-light line-clamp-2">{loan.purpose}</p>
+                  </div>
+
+                  <div className="pt-3.5 border-t border-white/5 flex items-center justify-between text-[10px] leading-none">
+                    <div>
+                      <span className="text-[8px] text-slate-500 uppercase font-medium">Clearance required</span>
+                      <span className="font-bold text-white block mt-1.5 font-mono">${loan.amountRequested.toLocaleString()}</span>
                     </div>
                     <div className="text-right">
-                      <p className="text-base font-black text-amber-400 font-mono">${req.amountRequested.toLocaleString()} USD</p>
-                      <span className="text-[10px] text-emerald-400 font-semibold">{req.offers.length} Competitive Bids</span>
+                      <span className="text-[8px] text-slate-500 uppercase font-medium">Bureau Rating</span>
+                      <span className="font-bold text-emerald-400 block mt-1.5 font-mono">{loan.creditScore} rating</span>
                     </div>
-                  </div>
-
-                  <p className="text-xs text-slate-300 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/50 mb-3">
-                    "{req.purpose}"
-                  </p>
-
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-800/40">
-                    <span className="flex items-center space-x-1">
-                      <Clock className="w-3 h-3 text-slate-500" />
-                      <span>{req.createdAt}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium">
-                      Best Rate Offered: {Math.min(...req.offers.map(o => o.interestRate))}% APR
-                    </span>
                   </div>
                 </div>
               ))}
             </div>
-
           </div>
 
         </div>

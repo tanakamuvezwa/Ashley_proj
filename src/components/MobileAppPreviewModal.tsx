@@ -52,11 +52,11 @@ export const MobileAppPreviewModal: React.FC<MobileAppPreviewModalProps> = ({
           </div>
 
           <h3 className="text-3xl font-extrabold text-white">
-            MBONGOCIRCLE Mobile App
+            ApexLend Mobile App
           </h3>
 
           <p className="text-xs text-slate-300 leading-relaxed">
-            Experience the "Uber for Loans" mobile interface. Designed for seamless performance on smartphones across Zimbabwe & SADC with offline PWA support, push notifications, and instant EcoCash / Bank wallet disburser.
+            Experience the "Uber for Loans" mobile interface. Designed for seamless performance on smartphones across Zimbabwe & SADC with offline PWA support, push notifications, and instant FinWallet / Bank wallet disburser.
           </p>
 
           <div className="space-y-2 text-xs">
@@ -103,7 +103,7 @@ export const MobileAppPreviewModal: React.FC<MobileAppPreviewModalProps> = ({
           <div className="px-4 py-2 bg-[#0B0F17] border-b border-slate-800/80 flex items-center justify-between z-20">
             <div className="flex items-center space-x-1.5">
               <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400" />
-              <span className="text-xs font-black text-white">MBONGOCIRCLE</span>
+              <span className="text-xs font-black text-white">APEXLEND</span>
             </div>
             <div className="flex items-center space-x-2">
               <Bell className="w-4 h-4 text-slate-400" />
@@ -144,8 +144,8 @@ export const MobileAppPreviewModal: React.FC<MobileAppPreviewModalProps> = ({
                 {/* Match Result inside mobile */}
                 {mobileMatched && (
                   <div className="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-xs text-emerald-300 space-y-1 animate-fade-in">
-                    <p className="font-bold text-white">🎉 2 Banks Bidding!</p>
-                    <p className="text-[10px]">Stanbic Zim: 7.8% APR • CBZ: 7.2% APR</p>
+                    <p className="font-bold text-white">Match Found: 2 Banks Bidding</p>
+                    <p className="text-[10px]">Horizon: 7.8% APR • Apex: 7.2% APR</p>
                   </div>
                 )}
 
@@ -201,11 +201,11 @@ export const MobileAppPreviewModal: React.FC<MobileAppPreviewModalProps> = ({
 
             {mobileTab === 'wallet' && (
               <div className="text-xs space-y-3">
-                <h4 className="font-bold text-white text-sm">MBONGOCIRCLE Wallet</h4>
+                <h4 className="font-bold text-white text-sm">ApexLend Wallet</h4>
                 <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
                   <span className="text-[10px] text-slate-400">Available Balance</span>
                   <p className="text-xl font-bold text-emerald-400 font-mono">$12,450.00 USD</p>
-                  <p className="text-[10px] text-slate-400 mt-1">Linked: EcoCash USD Wallet</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Linked: FinWallet USD Account</p>
                 </div>
               </div>
             )}

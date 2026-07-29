@@ -19,9 +19,9 @@ export const INITIAL_LOAN_REQUESTS: LoanRequest[] = [
     offers: [
       {
         id: 'LO-101',
-        lenderName: 'Stanbic Bank Zimbabwe',
+        lenderName: 'Horizon Commercial Bank',
         lenderType: 'Commercial Bank',
-        lenderLogo: '🏛️',
+        lenderLogo: 'Building2',
         interestRate: 8.5,
         monthlyPayment: 1482,
         totalRepayment: 26676,
@@ -31,9 +31,9 @@ export const INITIAL_LOAN_REQUESTS: LoanRequest[] = [
       },
       {
         id: 'LO-102',
-        lenderName: 'CBZ Agribusiness Fund',
+        lenderName: 'Apex Agribusiness Fund',
         lenderType: 'Commercial Bank',
-        lenderLogo: '🌿',
+        lenderLogo: 'Leaf',
         interestRate: 7.9,
         monthlyPayment: 1475,
         totalRepayment: 26550,
@@ -43,9 +43,9 @@ export const INITIAL_LOAN_REQUESTS: LoanRequest[] = [
       },
       {
         id: 'LO-103',
-        lenderName: 'Old Mutual SADC Impact Fund',
+        lenderName: 'Vanguard SADC Impact Fund',
         lenderType: 'SADC Private Equity',
-        lenderLogo: '🦁',
+        lenderLogo: 'TrendingUp',
         interestRate: 7.2,
         monthlyPayment: 1468,
         totalRepayment: 26424,
@@ -73,9 +73,9 @@ export const INITIAL_LOAN_REQUESTS: LoanRequest[] = [
     offers: [
       {
         id: 'LO-201',
-        lenderName: 'NMB Bank Renewable Energy Desk',
+        lenderName: 'EcoLend Renewable Energy Desk',
         lenderType: 'Commercial Bank',
-        lenderLogo: '⚡',
+        lenderLogo: 'Zap',
         interestRate: 6.8,
         monthlyPayment: 2616,
         totalRepayment: 94176,
@@ -85,9 +85,9 @@ export const INITIAL_LOAN_REQUESTS: LoanRequest[] = [
       },
       {
         id: 'LO-202',
-        lenderName: 'Ecobank Clean Infra',
+        lenderName: 'GeoPower Clean Infra',
         lenderType: 'Commercial Bank',
-        lenderLogo: '🌍',
+        lenderLogo: 'Globe',
         interestRate: 7.4,
         monthlyPayment: 2640,
         totalRepayment: 95040,
@@ -115,15 +115,15 @@ export const INITIAL_LOAN_REQUESTS: LoanRequest[] = [
     offers: [
       {
         id: 'LO-301',
-        lenderName: 'EcoCash Merchant Credit',
+        lenderName: 'FinWallet Merchant Credit',
         lenderType: 'FinTech Syndicate',
-        lenderLogo: '📲',
+        lenderLogo: 'Smartphone',
         interestRate: 9.2,
         monthlyPayment: 1313,
         totalRepayment: 15756,
         approvalProbability: 96,
         turnaroundTimeHours: 0.5,
-        specialFeatures: ['Instant EcoCash wallet disbursement', 'Daily POS revenue deductions']
+        specialFeatures: ['Instant mobile wallet disbursement', 'Daily POS revenue deductions']
       }
     ]
   }
@@ -143,6 +143,7 @@ export const INITIAL_PROJECT_PITCHES: ProjectPitch[] = [
     durationMonths: 24,
     location: 'Kariba Region',
     country: 'Zimbabwe',
+    countryCode: 'zw',
     entrepreneur: {
       name: 'Dr. Farai Mudarikwa',
       role: 'Agri-Economist & Lead Founder',
@@ -168,6 +169,7 @@ export const INITIAL_PROJECT_PITCHES: ProjectPitch[] = [
     durationMonths: 48,
     location: 'Gwanda District',
     country: 'Zimbabwe',
+    countryCode: 'zw',
     entrepreneur: {
       name: 'Tendai Zhou, PE',
       role: 'Renewable Energy Systems Engineer',
@@ -193,6 +195,7 @@ export const INITIAL_PROJECT_PITCHES: ProjectPitch[] = [
     durationMonths: 18,
     location: 'Harare Innovation Hub',
     country: 'Zimbabwe',
+    countryCode: 'zw',
     entrepreneur: {
       name: 'Rudo Gava',
       role: 'Former Senior Payments Architect',
@@ -203,7 +206,7 @@ export const INITIAL_PROJECT_PITCHES: ProjectPitch[] = [
     image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80',
     backersCount: 154,
     riskRating: 'A',
-    highlights: ['RBZ Sandbox participant', 'Licensed payment provider partner', '28k monthly active merchants']
+    highlights: ['Central Bank Sandbox participant', 'Licensed payment provider partner', '28k monthly active merchants']
   },
   {
     id: 'PRJ-104',
@@ -218,6 +221,7 @@ export const INITIAL_PROJECT_PITCHES: ProjectPitch[] = [
     durationMonths: 36,
     location: 'Gaborone Corridor',
     country: 'Botswana',
+    countryCode: 'bw',
     entrepreneur: {
       name: 'Kabo Kgosi',
       role: 'Logistics Operations Director',
@@ -235,9 +239,9 @@ export const INITIAL_PROJECT_PITCHES: ProjectPitch[] = [
 export const INSTITUTIONAL_PROVIDERS: InstitutionalProvider[] = [
   {
     id: 'INST-01',
-    name: 'Stanbic Bank Zimbabwe',
-    code: 'STANBIC-ZW',
-    logo: '🏛️',
+    name: 'Horizon Commercial Bank',
+    code: 'HORIZON-ZW',
+    logo: 'Building2',
     country: 'Zimbabwe',
     activeLiquidityUSD: 14500000,
     minTicketUSD: 5000,
@@ -248,9 +252,9 @@ export const INSTITUTIONAL_PROVIDERS: InstitutionalProvider[] = [
   },
   {
     id: 'INST-02',
-    name: 'CBZ Holdings & Capital',
-    code: 'CBZ-HOLDINGS',
-    logo: '🌿',
+    name: 'Apex Agribusiness Fund',
+    code: 'APEX-AGRI',
+    logo: 'Leaf',
     country: 'Zimbabwe',
     activeLiquidityUSD: 28000000,
     minTicketUSD: 2500,
@@ -261,9 +265,9 @@ export const INSTITUTIONAL_PROVIDERS: InstitutionalProvider[] = [
   },
   {
     id: 'INST-03',
-    name: 'Old Mutual SADC Private Credit',
-    code: 'OLDMUTUAL-SADC',
-    logo: '🦁',
+    name: 'Vanguard SADC Private Credit',
+    code: 'VANGUARD-SADC',
+    logo: 'TrendingUp',
     country: 'South Africa / SADC',
     activeLiquidityUSD: 50000000,
     minTicketUSD: 20000,
@@ -274,9 +278,9 @@ export const INSTITUTIONAL_PROVIDERS: InstitutionalProvider[] = [
   },
   {
     id: 'INST-04',
-    name: 'NMB Bank Zimbabwe',
-    code: 'NMB-BANK',
-    logo: '⚡',
+    name: 'EcoLend Renewable Energy Desk',
+    code: 'ECOLEND-ZW',
+    logo: 'Zap',
     country: 'Zimbabwe',
     activeLiquidityUSD: 18200000,
     minTicketUSD: 1000,
@@ -296,7 +300,7 @@ export const LIVE_FX_RATES: FXPair[] = [
     change24h: 0.12,
     buyRate: 13.80,
     sellRate: 13.90,
-    lastUpdated: 'Live RBZ Interbank Rate'
+    lastUpdated: 'Live Central Bank Rate'
   },
   {
     pair: 'USD / ZAR',
@@ -334,7 +338,7 @@ export const MOCK_INSURANCE_PRODUCTS: InsuranceQuote[] = [
   {
     id: 'INS-01',
     title: 'AgriGuard Climate & Drought Shield',
-    provider: 'Old Mutual Insurance Zimbabwe',
+    provider: 'Vanguard Climate Insurance',
     coverageType: 'Crop & Livestock',
     monthlyPremiumUSD: 45,
     maxCoverageUSD: 30000,
@@ -344,7 +348,7 @@ export const MOCK_INSURANCE_PRODUCTS: InsuranceQuote[] = [
   {
     id: 'INS-02',
     title: 'Solar & Inverter Asset Protection',
-    provider: 'NicozDiamond Insurance',
+    provider: 'SafeShield Asset Protection',
     coverageType: 'Solar Asset Damage',
     monthlyPremiumUSD: 60,
     maxCoverageUSD: 100000,
@@ -354,11 +358,11 @@ export const MOCK_INSURANCE_PRODUCTS: InsuranceQuote[] = [
   {
     id: 'INS-03',
     title: 'SADC Cross-Border Transit Security',
-    provider: 'Zimre Security & Cargo',
+    provider: 'GlobalTransit Cargo Insurance',
     coverageType: 'Cross-Border Cargo',
     monthlyPremiumUSD: 85,
     maxCoverageUSD: 150000,
     deductibleUSD: 750,
-    features: ['Beira & Durban port-to-door protection', 'GPS tracking integration', 'Border delay loss guarantee']
+    features: ['Corridor port-to-door protection', 'GPS tracking integration', 'Border delay loss guarantee']
   }
 ];

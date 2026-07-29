@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Badge */}
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-6 animate-pulse-glow">
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>MBONGOCIRCLE Holdings Limited • AI Financial Marketplace</span>
+            <span>ApexLend Holdings Limited • AI Financial Marketplace</span>
             <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
           </div>
 

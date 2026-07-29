@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle2, 
   ShieldCheck, 
@@ -10,44 +10,81 @@ import {
 } from 'lucide-react';
 
 export const LiveLedgerFeed: React.FC = () => {
-  const transactions = [
-    {
-      hash: '0x8f2a...91e4',
-      type: 'Loan Disbursement',
-      amount: '$25,000 USD',
-      borrower: 'Highveld Horticulture Co.',
-      institution: 'Stanbic Bank Zimbabwe',
-      status: 'Escrow Released to Supplier',
-      time: '3 mins ago'
-    },
-    {
-      hash: '0x3c1b...77f9',
-      type: 'Project Investment',
-      amount: '$10,000 USD',
-      borrower: 'Matabeleland 5MW Solar',
-      institution: 'Old Mutual SADC Fund',
-      status: 'Smart Equity Note Issued',
-      time: '14 mins ago'
-    },
-    {
-      hash: '0x9d4e...12a8',
-      type: 'FX Triangulation',
-      amount: '345,000 ZWG ➔ $24,909 USD',
-      borrower: 'Harare Express Logistics',
-      institution: 'RBZ Interbank Rail',
-      status: 'Settled in RTGS',
-      time: '28 mins ago'
-    },
-    {
-      hash: '0x5e7f...34c2',
-      type: 'Loan Repayment',
-      amount: '$1,482 USD',
-      borrower: 'SunPower Zim Commercial',
-      institution: 'NMB Bank',
-      status: 'Automated POS Settlement',
-      time: '42 mins ago'
-    }
-  ];
+  const [transactions, setTransactions] = useState<any[]>([]);
+
+  const fetchLedger = () => {
+    fetch('/api/loan-requests')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const fundedRequests = data.filter(r => r.status === 'Funded');
+          
+          // Format funded requests into transactions
+          const dynamicTx = fundedRequests.map((req) => {
+            const acceptedOffer = req.offers[0] || { lenderName: 'Horizon Commercial Bank' };
+            return {
+              hash: `0x${Math.floor(1000 + Math.random() * 9000).toString(16)}...${Math.floor(1000 + Math.random() * 9000).toString(16)}`,
+              type: 'Loan Disbursement',
+              amount: `$${req.amountRequested.toLocaleString()} USD`,
+              borrower: req.businessName,
+              institution: acceptedOffer.lenderName,
+              status: 'Escrow Released to Supplier',
+              time: 'Just Now'
+            };
+          });
+
+          // Mock seeds
+          const defaultTx = [
+            {
+              hash: '0x8f2a...91e4',
+              type: 'Loan Disbursement',
+              amount: '$25,000 USD',
+              borrower: 'Highveld Horticulture Co.',
+              institution: 'Horizon Commercial Bank',
+              status: 'Escrow Released to Supplier',
+              time: '3 mins ago'
+            },
+            {
+              hash: '0x3c1b...77f9',
+              type: 'Project Investment',
+              amount: '$10,000 USD',
+              borrower: 'Matabeleland 5MW Solar',
+              institution: 'Vanguard SADC Impact Fund',
+              status: 'Smart Equity Note Issued',
+              time: '14 mins ago'
+            },
+            {
+              hash: '0x9d4e...12a8',
+              type: 'FX Triangulation',
+              amount: '345,000 ZWG ➔ $24,909 USD',
+              borrower: 'Harare Express Logistics',
+              institution: 'Central Bank Triangulation Rail',
+              status: 'Settled in RTGS',
+              time: '28 mins ago'
+            },
+            {
+              hash: '0x5e7f...34c2',
+              type: 'Loan Repayment',
+              amount: '$1,482 USD',
+              borrower: 'SunPower Zim Commercial',
+              institution: 'EcoLend Renewable Energy Desk',
+              status: 'Automated POS Settlement',
+              time: '42 mins ago'
+            }
+          ];
+
+          setTransactions([...dynamicTx, ...defaultTx]);
+        }
+      })
+      .catch(err => console.error('Failed to load ledger feed:', err));
+  };
+
+  useEffect(() => {
+    fetchLedger();
+    // Poll every 10 seconds for live updates
+    const interval = setInterval(fetchLedger, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="glass-card p-6 rounded-3xl border-slate-800 my-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

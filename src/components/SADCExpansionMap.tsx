@@ -17,45 +17,45 @@ export const SADCExpansionMap: React.FC = () => {
     {
       code: 'ZW',
       country: 'Zimbabwe (Initial Focus HQ)',
-      flag: '🇿🇼',
+      flag: 'https://flagcdn.com/w40/zw.png',
       status: 'Active Anchor Market',
       activeUsers: '142,000+',
       capitalFlowUSD: '$42.8M',
       focusSectors: ['AgriTech Export', 'Commercial Solar', 'Mining Supply Chain', 'SME Credit'],
-      keyPartners: ['CBZ Bank', 'Stanbic Zim', 'NMB Bank', 'EcoCash'],
-      description: 'Primary technology launchpad. MBONGOCIRCLE connects Zimbabwean projects & businesses to domestic banks and international SADC liquidity pools.'
+      keyPartners: ['Apex Agribusiness Bank', 'Horizon Commercial Bank', 'EcoLend Renewable Energy Desk', 'FinWallet Mobile Credit'],
+      description: 'Primary technology launchpad. ApexLend connects Zimbabwean projects & businesses to domestic banks and international SADC liquidity pools.'
     },
     {
       code: 'ZA',
       country: 'South Africa',
-      flag: '🇿🇦',
+      flag: 'https://flagcdn.com/w40/za.png',
       status: 'SADC Expansion Phase 1',
       activeUsers: '68,000+',
       capitalFlowUSD: '$28.4M',
       focusSectors: ['Institutional Debt Funds', 'Cross-Border Freight', 'Renewable Micro-grids'],
-      keyPartners: ['Old Mutual Capital', 'Standard Bank SADC', 'JSE Private Market'],
+      keyPartners: ['Vanguard SADC Private Credit', 'SADC Development Bank', 'SADC Private Securities Market'],
       description: 'Institutional capital hub routing private equity and pension funds into high-yielding Zimbabwean & regional projects.'
     },
     {
       code: 'BW',
       country: 'Botswana',
-      flag: '🇧🇼',
+      flag: 'https://flagcdn.com/w40/bw.png',
       status: 'Active SADC Corridor',
       activeUsers: '24,000+',
       capitalFlowUSD: '$8.6M',
       focusSectors: ['Diamond Logistics', 'Eco-Tourism Debt', 'BWP/USD FX Clearing'],
-      keyPartners: ['First Capital Bank', 'Botswana Innovation Hub'],
+      keyPartners: ['Frontier Capital Bank', 'Botswana Innovation Hub'],
       description: 'Providing seamless diamond corridor FX liquidity and cross-border commercial equipment financing.'
     },
     {
       code: 'ZM',
       country: 'Zambia',
-      flag: '🇿🇲',
+      flag: 'https://flagcdn.com/w40/zm.png',
       status: 'Active SADC Corridor',
       activeUsers: '31,000+',
       capitalFlowUSD: '$11.2M',
       focusSectors: ['Copperbelt Agri-processing', 'Hydropower Solar Hybrids', 'ZMW Trade'],
-      keyPartners: ['Zambia National Commercial Bank', 'Lusaka Private Fund'],
+      keyPartners: ['Zambia Trade Development Bank', 'Lusaka Private Fund'],
       description: 'Facilitating cross-border agricultural off-take agreements and clean power infrastructure loans.'
     }
   ];
@@ -63,10 +63,10 @@ export const SADCExpansionMap: React.FC = () => {
   const activeMarket = sadcMarkets.find((m) => m.code === selectedCountryCode) || sadcMarkets[0];
 
   return (
-    <section className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-white/5 pb-8">
         <div>
           <div className="flex items-center space-x-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider mb-2">
             <Globe2 className="w-4 h-4" />
@@ -76,7 +76,7 @@ export const SADCExpansionMap: React.FC = () => {
             Zimbabwe Anchor & SADC Expansion Roadmap
           </h2>
           <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-            MBONGOCIRCLE is initially focused on Zimbabwe before scaling its AI loan matching network across the Southern African Development Community (SADC).
+            ApexLend is initially focused on Zimbabwe before scaling its AI loan matching network across the Southern African Development Community (SADC).
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export const SADCExpansionMap: React.FC = () => {
               }`}
             >
               <div className="flex items-center space-x-3">
-                <span className="text-3xl">{m.flag}</span>
+                <img src={m.flag} alt={m.code} className="w-8 h-5.5 object-cover rounded-sm border border-slate-800" />
                 <div>
                   <h3 className="font-bold text-white text-base">{m.country}</h3>
                   <span className="text-[10px] font-semibold text-emerald-400">
@@ -126,7 +126,7 @@ export const SADCExpansionMap: React.FC = () => {
               <span>Unified African Financial Ecosystem</span>
             </div>
             <p className="text-slate-300">
-              By standardizing credit scoring models and embedded FX rails, MBONGOCIRCLE removes cross-border friction for investors in South Africa or Botswana looking to fund high-yielding projects in Zimbabwe.
+              By standardizing credit scoring models and embedded FX rails, ApexLend removes cross-border friction for investors in South Africa or Botswana looking to fund high-yielding projects in Zimbabwe.
             </p>
           </div>
         </div>
@@ -136,7 +136,7 @@ export const SADCExpansionMap: React.FC = () => {
           <div className="glass-card p-6 sm:p-8 rounded-3xl border-emerald-500/40 relative">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
               <div className="flex items-center space-x-3">
-                <span className="text-4xl">{activeMarket.flag}</span>
+                <img src={activeMarket.flag} alt={activeMarket.code} className="w-10 h-7 object-cover rounded border border-slate-850" />
                 <div>
                   <h3 className="text-xl font-bold text-white">{activeMarket.country}</h3>
                   <p className="text-xs text-emerald-400 font-medium">{activeMarket.status}</p>
@@ -174,8 +174,9 @@ export const SADCExpansionMap: React.FC = () => {
               </h4>
               <div className="flex flex-wrap gap-2">
                 {activeMarket.keyPartners.map((partner, idx) => (
-                  <span key={idx} className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 text-xs font-medium">
-                    🏛️ {partner}
+                  <span key={idx} className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 text-xs font-medium flex items-center space-x-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{partner}</span>
                   </span>
                 ))}
               </div>

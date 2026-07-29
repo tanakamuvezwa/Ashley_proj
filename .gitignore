@@ -117,3 +117,7 @@ $RECYCLE.BIN/
 dist/
 dist-ssr/
 *.local
+
+# Sensitive credential files
+atlas-credentials.env
+test_key.js

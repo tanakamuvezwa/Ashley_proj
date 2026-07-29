@@ -24,17 +24,17 @@ export const AiAdvisorWidget: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       sender: 'ai',
-      text: 'Salibonani / Mhoro! I am MBONGO AI — your intelligent SADC financial advisor. How can I help you get capital or invest today?',
+      text: 'Mhoro / Salibonani! I am Apex AI — your intelligent SADC financial advisor. How can I help you get capital or invest today?',
       timestamp: 'Just now',
       quickActions: [
-        { label: '💡 How to get 7.2% APR loan?', action: 'loan-rates' },
-        { label: '🇿🇼 ZWG / USD FX details', action: 'fx-info' },
-        { label: '🏛️ Which banks are bidding?', action: 'banks-info' }
+        { label: 'How to get a 7.2% APR loan?', action: 'loan-rates' },
+        { label: 'ZWG / USD FX details', action: 'fx-info' },
+        { label: 'Which institutions are bidding?', action: 'banks-info' }
       ]
     }
   ]);
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const query = textToSend || inputQuery;
     if (!query.trim()) return;
 
@@ -47,29 +47,40 @@ export const AiAdvisorWidget: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInputQuery('');
 
-    // Generate intelligent AI response based on keywords
-    setTimeout(() => {
-      let replyText = "MBONGOCIRCLE AI analyzes real-time market data across 28+ banks in Zimbabwe & SADC. Based on your query, we recommend using the 'Uber for Loans' matching engine to submit your project metrics!";
+    // Push placeholder thinking message
+    const typingMsg: ChatMessage = {
+      sender: 'ai',
+      text: 'Thinking...',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setMessages((prev) => [...prev, typingMsg]);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await response.json();
       
-      const qLower = query.toLowerCase();
-      if (qLower.includes('rate') || qLower.includes('apr') || qLower.includes('interest')) {
-        replyText = "Current loan rates range from 6.8% to 9.2% APR depending on risk score. NMB Renewable Desk offers 6.8% for solar projects, while Old Mutual SADC Impact Fund offers 7.2% for export agriculture!";
-      } else if (qLower.includes('zwg') || qLower.includes('fx') || qLower.includes('zar') || qLower.includes('currency')) {
-        replyText = "The official RBZ interbank rate for USD/ZWG is 13.85. MBONGOCIRCLE provides direct RTGS triangulated clearing between ZWG, ZAR, and USD with 0% extra margin.";
-      } else if (qLower.includes('bank') || qLower.includes('stanbic') || qLower.includes('cbz') || qLower.includes('old mutual')) {
-        replyText = "Participating liquidity providers include Stanbic Bank Zimbabwe ($14.5M pool), CBZ Agribusiness ($28M pool), NMB Bank ($18.2M), and Old Mutual SADC Private Credit ($50M). Bids arrive within 120 seconds of submission.";
-      } else if (qLower.includes('pitch') || qLower.includes('invest') || qLower.includes('project')) {
-        replyText = "To pitch your project, click 'Pitch Your Project Idea' in the Pitch Room. Projects with off-take supply agreements or solar asset collateral achieve a 98% funding match rate!";
-      }
-
-      const aiReply: ChatMessage = {
-        sender: 'ai',
-        text: replyText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setMessages((prev) => [...prev, aiReply]);
-    }, 600);
+      setMessages((prev) => {
+        const filtered = prev.slice(0, prev.length - 1);
+        return [...filtered, {
+          sender: 'ai',
+          text: data.text || 'I encountered an issue processing your query.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }];
+      });
+    } catch (err) {
+      setMessages((prev) => {
+        const filtered = prev.slice(0, prev.length - 1);
+        return [...filtered, {
+          sender: 'ai',
+          text: 'Unable to connect to AI server. Please verify connections.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }];
+      });
+    }
   };
 
   return (
@@ -82,7 +93,7 @@ export const AiAdvisorWidget: React.FC = () => {
           className="relative group p-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-amber-500 text-slate-950 font-bold shadow-2xl shadow-emerald-900/50 hover:scale-105 transition-all duration-300 flex items-center space-x-2.5 cursor-pointer border border-white/20 ring-4 ring-emerald-500/20"
         >
           <Bot className="w-6 h-6 fill-slate-950 animate-bounce" />
-          <span className="text-xs font-black uppercase tracking-wider hidden sm:inline">Ask MBONGO AI</span>
+          <span className="text-xs font-black uppercase tracking-wider hidden sm:inline">Ask Apex AI</span>
           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500"></span>
@@ -102,7 +113,7 @@ export const AiAdvisorWidget: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-sm font-bold text-white flex items-center space-x-1">
-                  <span>MBONGO AI Assistant</span>
+                  <span>Apex AI Assistant</span>
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 </h4>
                 <p className="text-[10px] text-emerald-400 font-medium">Online • 28 SADC Banks Connected</p>
