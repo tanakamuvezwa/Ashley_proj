@@ -1,4 +1,4 @@
-export type NavigationTab = 'home' | 'uber-loans' | 'projects' | 'institutional' | 'services' | 'sadc-map' | 'admin-dashboard';
+export type NavigationTab = 'home' | 'uber-loans' | 'projects' | 'institutional' | 'services' | 'sadc-map' | 'admin-dashboard' | 'dashboard';
 
 export interface UserAccount {
   id: string;
@@ -7,6 +7,7 @@ export interface UserAccount {
   role: 'borrower' | 'lender' | 'admin';
   status: 'Active' | 'Suspended';
   createdAt: string;
+  token?: string;
 }
 
 export interface LoanOffer {

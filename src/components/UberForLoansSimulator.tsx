@@ -14,9 +14,13 @@ import {
   UserCheck,
   Building
 } from 'lucide-react';
-import { LoanRequest, LoanOffer } from '../types';
+import { LoanRequest, LoanOffer, UserAccount } from '../types';
 
-export const UberForLoansSimulator: React.FC = () => {
+interface UberForLoansSimulatorProps {
+  currentUser?: UserAccount | null;
+}
+
+export const UberForLoansSimulator: React.FC<UberForLoansSimulatorProps> = ({ currentUser }) => {
   // KYC Verification state
   const [kycVerified, setKycVerified] = useState<boolean>(() => {
     return localStorage.getItem('apex_kyc_verified') === 'true';
@@ -140,7 +144,8 @@ export const UberForLoansSimulator: React.FC = () => {
           amountRequested: amount,
           tenureMonths: tenure,
           purpose,
-          location
+          location,
+          userId: currentUser?.id || null
         })
       });
 

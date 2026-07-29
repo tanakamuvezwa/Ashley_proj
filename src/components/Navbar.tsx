@@ -15,7 +15,8 @@ import {
   ShieldAlert,
   Sun,
   Moon,
-  Compass
+  Compass,
+  LayoutDashboard
 } from 'lucide-react';
 import { NavigationTab, UserAccount } from '../types';
 
@@ -99,15 +100,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             /* Authenticated Navigation */
             <>
               <button
-                onClick={() => setActiveTab('home')}
+                onClick={() => setActiveTab('dashboard')}
                 className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition ${
-                  activeTab === 'home'
+                  activeTab === 'dashboard'
                     ? 'bg-emerald-600 text-white shadow-md'
                     : 'text-slate-350 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
-                <Home className="w-3.5 h-3.5" />
-                <span>Dashboard</span>
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>My Workspace</span>
               </button>
 
               {currentUser.role === 'borrower' && (

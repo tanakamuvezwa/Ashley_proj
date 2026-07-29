@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ProjectPitch } from '../types';
+import { ProjectPitch, UserAccount } from '../types';
 import { 
   Briefcase, 
   PlusCircle, 
@@ -16,7 +16,11 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-export const ProjectMarketplace: React.FC = () => {
+interface ProjectMarketplaceProps {
+  currentUser?: UserAccount | null;
+}
+
+export const ProjectMarketplace: React.FC<ProjectMarketplaceProps> = ({ currentUser }) => {
   const [pitches, setPitches] = useState<ProjectPitch[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedCountry, setSelectedCountry] = useState<string>('All');
@@ -88,7 +92,8 @@ export const ProjectMarketplace: React.FC = () => {
           targetCapital: newTarget,
           projectedROI: newRoi,
           pitchSummary: newSummary,
-          location: newLocation
+          location: newLocation,
+          userId: currentUser?.id || null
         })
       });
 

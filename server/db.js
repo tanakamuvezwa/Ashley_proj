@@ -28,6 +28,7 @@ const LoanOfferSchema = new mongoose.Schema({
 
 const LoanRequestSchema = new mongoose.Schema({
   id: String,
+  userId: String,
   borrowerName: String,
   borrowerAvatar: String,
   businessName: String,
@@ -46,6 +47,7 @@ const LoanRequestSchema = new mongoose.Schema({
 
 const ProjectPitchSchema = new mongoose.Schema({
   id: String,
+  userId: String,
   title: String,
   tagline: String,
   category: String,
@@ -57,7 +59,7 @@ const ProjectPitchSchema = new mongoose.Schema({
   durationMonths: Number,
   location: String,
   country: String,
-  countryCode: String, // For FlagCDN (e.g. 'ZW', 'ZA')
+  countryCode: String,
   entrepreneur: {
     name: String,
     role: String,
@@ -147,7 +149,7 @@ const SEED_DATA = {
       id: 'USR-001',
       name: 'Apex Admin',
       email: 'admin@apexlend.ai',
-      password: 'AdminPass123',
+      password: '$2b$12$UAklfwyYXPzUn6MPa7HGouON7MTV9vaBfGRXS2qf03gTMyGHbLfnm',
       role: 'admin',
       status: 'Active',
       createdAt: '2026-07-29T12:00:00Z'
@@ -156,7 +158,7 @@ const SEED_DATA = {
       id: 'USR-002',
       name: 'Ashley Founder',
       email: 'ashley@apexlend.ai',
-      password: 'AshleyPass123',
+      password: '$2b$12$OT.jSCv8GX0rc2C.1GTzOeUL24NFEel1Z960Su11fl7jc0t4IrBXK',
       role: 'borrower',
       status: 'Active',
       createdAt: '2026-07-29T12:00:00Z'
@@ -165,7 +167,7 @@ const SEED_DATA = {
       id: 'USR-003',
       name: 'Vanguard Capital',
       email: 'lender@apexlend.ai',
-      password: 'LenderPass123',
+      password: '$2b$12$Sz/bnOWsNDgvlClY1rMnOeGq1I.fjuWx.RU0i35XOQq0aJylnJ3j.',
       role: 'lender',
       status: 'Active',
       createdAt: '2026-07-29T12:00:00Z'
