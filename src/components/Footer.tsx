@@ -12,7 +12,7 @@ import {
 
 export const Footer: React.FC = () => {
  return (
- <footer className="border-t theme-border pt-16 pb-12 theme-muted text-xs" style={{ background: 'var(--bg-surface)' }}>
+ <footer className="border-t theme-border pt-16 pb-12 theme-muted text-xs theme-surface">
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
  
  {/* Top Grid */}

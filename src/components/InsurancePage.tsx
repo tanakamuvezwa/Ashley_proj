@@ -45,7 +45,7 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ quote, onClose, onConfirm }) =>
  </button>
 
  <div className="flex items-center space-x-3 mb-5">
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${accent} bg-current/10 bg-opacity-10`} style={{ background: 'rgba(16,185,129,0.1)' }}>
+ <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${accent} bg-[var(--accent-soft)]`} >
  <CovIcon className={`w-5 h-5 ${accent}`} />
  </div>
  <div>
@@ -199,7 +199,7 @@ export const InsurancePage: React.FC = () => {
  <div key={product.id} className={`glass-card p-6 rounded-2xl border bg-gradient-to-br ${gradClass} transition-all hover:-translate-y-1 hover:shadow-xl group`}>
  <div className="flex items-start justify-between mb-4">
  <div className="flex items-center space-x-3">
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${accent}`} style={{ background: 'rgba(255,255,255,0.05)' }}>
+ <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${accent}`} >
  <CovIcon className="w-5 h-5" />
  </div>
  <div>

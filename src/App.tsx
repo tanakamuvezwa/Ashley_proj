@@ -55,20 +55,25 @@ export const App: React.FC = () => {
  const [isMobilePreviewOpen, setIsMobilePreviewOpen] = useState<boolean>(false);
  const [isCalculatorOpen, setIsCalculatorOpen] = useState<boolean>(false);
  const [selectedRegion, setSelectedRegion] = useState<string>('ZW');
- const [theme, setTheme] = useState<string>(() => {
- const saved = localStorage.getItem('apex_theme');
- if (saved === 'light-aura' || saved === 'theme-light') return 'theme-light';
- return 'theme-dark';
- });
+  const [theme, setTheme] = useState<string>(() => {
+    const saved = localStorage.getItem('apex_theme');
+    return saved || 'theme-midnight';
+  });
 
- // ── Theme sync ─────────────────────────────────────────────────────────────
- useEffect(() => {
- document.documentElement.classList.remove(
- 'theme-dark', 'theme-light', 'dark-midnight', 'light-aura', 'nordic-forest'
- );
- document.documentElement.classList.add(theme);
- localStorage.setItem('apex_theme', theme);
- }, [theme]);
+  // ── Theme sync ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    // Remove all existing theme-related classes dynamically
+    const classes = Array.from(document.documentElement.classList);
+    classes.forEach(cls => {
+      if (cls.startsWith('theme-') || cls.endsWith('-aura') || cls.endsWith('-forest') || cls.endsWith('-midnight')) {
+        document.documentElement.classList.remove(cls);
+      }
+    });
+    
+    // Apply the active theme
+    document.documentElement.classList.add(theme);
+    localStorage.setItem('apex_theme', theme);
+  }, [theme]);
 
  // ── Session restore + server verification ──────────────────────────────────
  useEffect(() => {
