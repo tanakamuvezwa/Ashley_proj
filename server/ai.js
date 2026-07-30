@@ -109,7 +109,7 @@ export async function tryGeminiReply(query, contextText, history = []) {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash-lite',
       systemInstruction: `You are Apex AI, an expert SADC financial advisor for the ApexLend marketplace platform. Be brief (2-4 sentences), clear, and professional. Use the platform context provided. Plain text only — no markdown, no bullet points.`
     });
 
