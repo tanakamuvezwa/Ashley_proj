@@ -20,7 +20,21 @@ export default {
           dark: '#0B0F17',
           surface: '#131B2E',
           border: '#1F2D4A'
-        }
+        },
+        slate: {
+          950: 'var(--bg-main)',
+          900: 'var(--bg-surface)',
+          800: 'var(--bg-card)',
+          500: 'var(--text-subtle)',
+          400: 'var(--text-muted)',
+          300: 'var(--text-muted)',
+        },
+        emerald: {
+          400: 'var(--accent)',
+          500: 'var(--accent)',
+          600: 'var(--accent-hover)',
+        },
+        white: 'var(--text-primary)'
       },
       fontFamily: {
         sans: ['Outfit', 'Inter', 'sans-serif'],
