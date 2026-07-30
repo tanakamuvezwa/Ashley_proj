@@ -174,14 +174,30 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center space-x-3">
           
           {/* Theme toggle */}
-          <button
-            onClick={() => onChangeTheme(isLight ? 'theme-dark' : 'theme-light')}
-            className={`p-2.5 rounded-xl border theme-border transition cursor-pointer flex items-center space-x-1.5 ${isLight ? 'bg-slate-100 theme-muted hover:theme-text' : 'bg-slate-900 text-slate-400 hover:text-white'}`}
-            title={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {isLight ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
-            <span className="text-[10px] font-semibold hidden sm:inline">{isLight ? 'Dark' : 'Light'}</span>
-          </button>
+          <div className="relative group shrink-0">
+            <button className={`p-2.5 rounded-xl border theme-border transition cursor-pointer flex items-center space-x-1.5`} style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }} title="Switch theme">
+              <Sun className="w-4 h-4 text-emerald-400" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+            <div className={`absolute right-0 mt-2 w-48 rounded-2xl border theme-border shadow-2xl p-2 hidden group-hover:block transition duration-200 z-50`} style={{ background: 'var(--bg-surface)' }}>
+              {[
+                { id: 'theme-midnight', label: 'Midnight Dark', icon: Moon },
+                { id: 'theme-slate', label: 'Slate Blue', icon: Moon },
+                { id: 'theme-charcoal', label: 'Warm Charcoal', icon: Moon },
+                { id: 'theme-light', label: 'Clean Light', icon: Sun },
+                { id: 'theme-forest', label: 'Deep Forest', icon: Compass }
+              ].map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => onChangeTheme(t.id)}
+                  className={`w-full flex items-center space-x-2 px-3 py-2.5 rounded-xl text-left transition cursor-pointer ${theme === t.id ? 'bg-emerald-500/10 text-emerald-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}
+                >
+                  <t.icon className={`w-3.5 h-3.5 ${theme === t.id ? 'text-emerald-400' : 'text-slate-400'}`} />
+                  <span className="text-xs">{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
           {!currentUser ? (
             <div className="flex items-center space-x-2">
