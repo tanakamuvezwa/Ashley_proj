@@ -87,9 +87,9 @@
     --bg-card:       rgba(255, 255, 255, 0.9);
     --bg-input:      #f1f5f9;
     --bg-nav:        rgba(255, 255, 255, 0.95);
-    --text-primary:  #0f172a;
-    --text-muted:    #475569;
-    --text-subtle:   #64748b;
+    --text-primary:  #000000;
+    --text-muted:    #1e293b;
+    --text-subtle:   #334155;
     --border:        rgba(0, 0, 0, 0.08);
     --accent:        #059669;
     --accent-hover:  #047857;
